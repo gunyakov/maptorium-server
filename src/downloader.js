@@ -237,11 +237,11 @@ class Downloader {
     let arrMapInfo = [];
     //console.log(process);
     //Get list of files
-    let mapsList = fs.readdirSync(process.mainModule.path + "/maps");
+    let mapsList = fs.readdirSync(process.cwd() + "/maps");
     //Walk files list
     for(let i = 0; i < mapsList.length; i++) {
       //Require module of map handler
-      let map = require(process.mainModule.path + "/maps/" + mapsList[i]);
+      let map = require(process.cwd() + "/maps/" + mapsList[i]);
       //Init map handler
       map = new map();
       let mapInfo = await map.getInfo();

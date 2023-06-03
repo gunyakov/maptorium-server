@@ -50,6 +50,6 @@ app.use('/core', require('./routes/core.js'));
   //----------------------------------------------------------------------------
   //Open port for incoming requests
   //----------------------------------------------------------------------------
-  await httpServer.listen(config.service.port);
+  httpServer.listen(config.service.port);
   Log.make("info", "MAIN", "User UI -> http://127.0.0.1:" + config.service.port);
 })();

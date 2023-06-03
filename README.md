@@ -1,20 +1,14 @@
-# maptorium
+# maptorium-server
 
-### Help me pls
-
-I'm looking for good html coder and who know leaflet library/how to write leaflet plugins very well to fully rewrite User UI and add a lot of futures inside. [Join Telegram Groupe to contribute or ask questions](https://t.me/maptorium)
-
-## Tile Map Downloader
+[Join Telegram Groupe to contribute or ask questions](https://t.me/maptorium)
 
 ### Description
 
-![Main UI](/main.png)
-
-This software can help you to download localy any tile map (now raster and vector MapBox type is supported).
-
-[![Maptorium promo video](http://img.youtube.com/vi/cgqhKeX2Nk4/0.jpg)](https://youtu.be/cgqhKeX2Nk4)
+Maptorium`s project http server - any tiles cached server. 
 
 ### Installation
+
+#### Linux users 
 
 ```
 git clone https://github.com/gunyakov/maptorium.git
@@ -23,16 +17,27 @@ cd maptorium
 
 npm install
 
-npm start
+npm run prepare
+
+npm run start
 ```
 
 After navigate in browser to http://localhost:9009
+
+<details>
+
+<summary>SQLite3 module compilation error</summary>
 
 If you have any problems during SQLite3 module compilation, run next command
 
 ```
 npm install https://github.com/mapbox/node-sqlite3/tarball/master
 ```
+
+</details>
+
+
+
 
 #### Windows users
 
@@ -61,30 +66,6 @@ Next futures to add:
 
 ### Version
 
-Very early version 0.9.6. Under heavy development
+0.9.7 - 03 June 2023. Split project into 3 parts.
 
-02.03.2023 - PM2 module romove from project.
 
-16.11.2022 - Polygons merge by Tuff.js
-
-24.09.2022 - Vector tiles (MapBox) support.
-
-17.08.2022 - Random tile download mode. (See promo video how it`s work.)
-
-16.08.2022 - Version 0.8.8. Middle update of job manager.
-
-09.08.2022 - Version 0.8.2. POI editation (change from Geoman to Leaflet.editable plugin). Storage all POI and options for POI in DB.
-
-16.07.2022 - Version 0.8.0. UI update.
-
-08.05.2022 - GPS module, GPS point on map(module write for online http server to get GPS, if you need read data from usb gps, you need rewrite gps.js to get data correcly), folder structure change, some small bugs resolving (now compatible with Windows).
-
-13.02.2022 - Basic POI editing function (Leaflet geoman plugin). Organize DB for storing all geometry. Basic tile cached map.
-
-01.02.2022 - Full UI remastering. Now use profesional HTML theme. Jobs list, Job status bar, Tiles Grid, etc.
-
-29.01.2022 - Add yandex sat map, some errors resolve, UI dynamicaly get maps list from server
-
-28.01.2022 - TOR service, SOCKS/HTTP Proxy request, Check IP during loading.
-
-0.1.0 - Core service, Mass tiles downloading by selecting tile and zoom level.
