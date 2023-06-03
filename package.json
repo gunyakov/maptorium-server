@@ -1,0 +1,67 @@
+{
+  "name": "maptorium-server",
+  "version": "0.9.7",
+  "description": "Maptorium backend http api server.",
+  "bin": "index.js",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node build.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gunyakov/maptorium-server.git"
+  },
+  "keywords": [
+    "google",
+    "map",
+    "sattelite",
+    "offline"
+  ],
+  "author": "Oleg Gunyakov",
+  "license": "GPL-3.0-only",
+  "bugs": {
+    "url": "https://github.com/gunyakov/maptorium/issues"
+  },
+  "homepage": "https://github.com/gunyakov/maptorium#readme",
+  "dependencies": {
+    "@serialport/parser-readline": "^11.0.0",
+    "@turf/turf": "^6.5.0",
+    "@turf/union": "^6.5.0",
+    "array-move": "^4.0.0",
+    "axios": "^0.25.0",
+    "body-parser": "^1.20.0",
+    "cheerio": "^1.0.0-rc.12",
+    "client-nmea-socket-to-event": "^1.1.6",
+    "colors": "^1.4.0",
+    "crc-32": "^1.2.1",
+    "express": "^4.17.2",
+    "https-proxy-agent": "^5.0.0",
+    "leaflet": "^1.9.4",
+    "md5": "^2.3.0",
+    "moment": "^2.29.4",
+    "nmea-simple": "^3.3.0",
+    "point-in-polygon": "^1.1.0",
+    "serialport": "^11.0.0",
+    "sharp": "^0.31.1",
+    "socks-proxy-agent": "^6.1.1",
+    "sqlite3": "^5.0.10"
+  },
+  "pkg": {
+    "scripts": [
+      "src/*.js",
+      "maps/*.js",
+      "public/*",
+      "routes/*.js"
+    ],
+    "targets": [
+      "node16-win"
+    ],
+    "outputPath": "."
+  },
+  "devDependencies": {
+    "@angablue/exe": "^1.2.0",
+    "tsx": "^3.12.7"
+  }
+}
