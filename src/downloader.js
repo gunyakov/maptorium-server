@@ -5,7 +5,7 @@ const fs = require('fs');
 //------------------------------------------------------------------------------
 //Array manipulation
 //------------------------------------------------------------------------------
-let arrayFunc = require("array-move");
+let {arrayMoveMutable} = require("./array_move.js");
 //------------------------------------------------------------------------------
 //Image manipulation
 //------------------------------------------------------------------------------
@@ -297,7 +297,7 @@ class Downloader {
   async jobUP(ID) {
     for(let i = 0; i < this.arrJobList.length; i++) {
       if(this.arrJobList[i]['ID'] == ID) {
-        this.arrJobList = arrayFunc.arrayMoveImmutable(this.arrJobList, i, i - 1);
+        this.arrJobList = arrayMoveImmutable(this.arrJobList, i, i - 1);
         break;
       }
     }
@@ -307,7 +307,7 @@ class Downloader {
   async jobDown(ID) {
     for(let i = 0; i < this.arrJobList.length; i++) {
       if(this.arrJobList[i]['ID'] == data.ID) {
-        this.arrJobList = arrayFunc.arrayMoveImmutable(this.arrJobList, i, i + 1);
+        this.arrJobList = arrayMoveImmutable(this.arrJobList, i, i + 1);
         break;
       }
     }
