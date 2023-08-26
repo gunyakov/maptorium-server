@@ -2,18 +2,56 @@
 
 [Join Telegram Groupe to contribute or ask questions](https://t.me/maptorium)
 
+Not all features tested in real life. Thats why as much people contribute to testing, as fast I will make stable release.
+
 ### Description
 
-Maptorium`s project http server - any tiles cached server. 
+This is HTTP + Socket.IO API server what can do next:
+
+1. Make any tiles cache to use such cache offline.
+    - Rasted tiles support (JPEG/PNG).
+    - Vector tiles support (MapBox, ArcGis[^1]).
+    - Any other types what can be rendered by UI.
+    - Cache DB is fully compatible with [SAS Planet](https://sasgis.org) sqlite storage.
+2. Records GPS routes from different sources.
+    - Custom GPS HTML server[^3].
+    - TCP NMEA Server.
+    - USB/COM NMEA devices[^4].
+3. Store POI (polyline, polygon, point) in DB.
+4. Make mass tiles downloads with reach options.
+    - HTTP/HTTPS/Socks support
+    - TOR support including New ID getting.
+    - Different options to check tile age, state and so one.
+5. Generate from downloaded tiles upper zoom levels.
+6. Generate cached map info (info about missed/downloaded/empty tiles) for selected area.
+7. Next maps support from box:
+    - ArcGis Elevation (rasted)
+    - ArcGis Satelite (rasted)
+    - ArcGis Vector as hybrid overlay (vector)[^1]
+    - Google Satelite (rasted)
+    - Google Hybrid Ru version (rasted)
+    - Google Hybrid Eng version (rasted)
+    - MapBox as Hybrid overlay (vector)[^2]
+    - MapBox Terraine (rasted)
+    - OSM (rasted)
+    - OSM Marine as overlay.
+    - Yandex Satelite (rasted)
+    - Yandex Hybrid (rasted)
+    - Any other maps what you can imagine and add.
+
+This is a part of Maptorium project. Must work with 
+Maptorium HTML UI to have all this features avaliable.
 
 ### Installation
 
-#### Linux users 
+#### Linux / Windows users 
+
+You must have NodeJS 16 version minimum installed in system to run this server.
 
 ```
-git clone https://github.com/gunyakov/maptorium.git
+git clone https://github.com/gunyakov/maptorium-server.git
 
-cd maptorium
+cd maptorium-server
 
 npm install
 
@@ -21,8 +59,6 @@ npm run prepare
 
 npm run start
 ```
-
-After navigate in browser to http://localhost:9009
 
 <details>
 
@@ -36,36 +72,33 @@ npm install https://github.com/mapbox/node-sqlite3/tarball/master
 
 </details>
 
+#### UI Installation
 
+If you run `npm run prepare` before, you already have Leaflet UI installed and ready to use. But you can select another UI in list and install it manualy. Installation same as static folder for Express.
 
+| Engine | Link | Descirption | 
+| - | - | - |
+| Leaflet | [Download](https://github.com/gunyakov/maptorium-leaflet) | Based on Leaflet engine. 2D map. very close to [SAS Planet](https://sasgis.org) |
+| Cesium  | [Download](https://github.com/gunyakov/maptorium-cesium) | Based on Cesium engine. 3D map, very close to Google Earth[^5]. |
+
+You can write your own UI using server [API](./API.md) to get data and tiles.
 
 #### Windows users
 
-Available v0.9.6-beta-win-x64 portable version for Windows users. You can download it [here](https://github.com/gunyakov/maptorium/releases/tag/0.9.6)
+Available v1.0.0-beta-win-x64 portable version with Lealfet UI for Windows users. You can download it [here](https://github.com/gunyakov/maptorium-server/releases/tag/1.0.0)
 
-### Additional Info
+## To Do
 
-All tiles stored in sqlite3 DB. Storage aragement is fully compatible with [SAS Planet](https://sasgis.org)
+- [ ] COM Nmea devices support for Win and Linux
+- [ ] POI Categories Support
+- [ ] Ability to set all server config from UI
 
-Once you view map, it will store all tiles in DB forever.
+[^1]: Server can download tiles but Leaflet UI still cant render ArcGis vector tiles as I cant find proper library for this map type to be compatible with last Leaflet release.
 
-You have 3 modes of map viewing. Internet & Cache - default mode where tiles search in DB first and if missing, then downloaded from internet. Internet only - download all tiles from internet and update tiles in DB. Cache - search tiles only in DB, no any internet use.
+[^2]: Possible to use as main map and not like overlay. But proper style must be connected to Leaflet UI. May be I will implement this in future release.
 
-You can select tile, after select zoom level and sotfware will start mass tile download. Now you can add few download jobs and leave you computer unattended.
+[^3]: You must change code to get properly data from such server. Open file `gps/gps_core.ts`, find `getGPSCoords()` function and implement there your logic.
 
-As its based on nodejs, you can install this software on oyur remote server/vps and control it directly from internet.
+[^4]: Not yet tested as i have no such device.
 
-It's possible to use proxy server to download tiles. Now support any type of proxy: http(s), socks(4,5). Also it support using tor. If you mass download tiles from server and server ban you IP, software will sent signal to tor to change automaticaly Tor ID and continue downloading (need enable tor control port and tor auth).
-
-To add more maps, copy any file from **maps** folder and just change map url parameters.
-
-Next futures to add:
-- More complex download job manager
-- Generating up zoom layers from already dowloaded down zoom layer (Example: from Z18 generate Z17-Z10 layers, very usefull for sat imagenery to extremly decrease number of tiles to download)
-- Tile cached map (View on map what tiles from selected zoom and map already in DB)
-
-### Version
-
-0.9.7 - 03 June 2023. Split project into 3 parts.
-
-
+[^5]: Limited functionality as I still didn`t finish this part. 
