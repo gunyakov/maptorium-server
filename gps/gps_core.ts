@@ -49,17 +49,19 @@ class GPS {
   //----------------------------------------------------------------------------
   //Start GPS service function
   //----------------------------------------------------------------------------
-  public async start():Promise<void> {
+  public async start():Promise<boolean> {
     this._enable = true;
     Log.info(LogModules.gps, "GPS service started.");
     this.service();
+    return true;
   }
   //----------------------------------------------------------------------------
   //Stop GPS service function
   //----------------------------------------------------------------------------
-  public async stop():Promise<void> {
+  public async stop():Promise<boolean> {
     this._enable = false;
     Log.info(LogModules.gps, "GPS service stoped.");
+    return true;
   }
   //----------------------------------------------------------------------------
   //Change sample rate time

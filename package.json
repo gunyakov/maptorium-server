@@ -1,6 +1,6 @@
 {
   "name": "maptorium-server",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Maptorium backend http api server.",
   "bin": "index.js",
   "main": "index.tsx",
@@ -30,7 +30,7 @@
     "@turf/turf": "^6.5.0",
     "@turf/union": "^6.5.0",
     "@types/sqlite3": "^3.1.8",
-    "axios": "^1.5.0",
+    "axios": "^0.25.0",
     "body-parser": "^1.20.2",
     "cheerio": "^1.0.0-rc.12",
     "client-nmea-socket-to-event": "^1.1.6",
@@ -49,6 +49,7 @@
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
+    "@tsconfig/recommended": "^1.0.2",
     "@types/express": "^4.17.17",
     "@types/leaflet": "^1.9.3",
     "@types/md5": "^2.3.2",

@@ -1,7 +1,12 @@
 maptorium-server Changelog
 =================
 
-## 1.0.0 (2023-09-03)
+## 2.0.1 (2023-08-29)
+
+### 🔧 Workflow
+* GPS start/stop support from UI
+
+## 2.0.0 (2023-08-28)
 
 ### 🔧 Workflow
 * Convert from JS Common to TypeScript

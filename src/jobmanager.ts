@@ -152,7 +152,6 @@ class JobManager {
         if(index != -1) {
             this._handlers[ID].start();
             this._jobsRunning++;
-            console.log("Job Count", this._jobsRunning);
             this._arrJobsList[index].running = true;
             return true;
             

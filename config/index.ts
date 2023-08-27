@@ -1,8 +1,8 @@
 import { UserConfig } from "../src/interface";
 import config from "./config";
 export default config;
-export var userConfig = require("./config.user.json") as UserConfig;
-const filePath = process.cwd() + '/config/config.user.json';
+export var userConfig = require(process.cwd() + "/config.user.json") as UserConfig;
+const filePath = process.cwd() + '/config.user.json';
 //------------------------------------------------------------------------------
 //NodeJS FS
 //------------------------------------------------------------------------------
@@ -20,8 +20,6 @@ if(!userConfig.recordRoute) {
 if(userConfig.gpsSampleTime > 0) {
     GPS.sampleRate(userConfig.gpsSampleTime);
 }
-
-GPS.start();
 
 if(userConfig.mode in DownloadMode) {
     config.network.state = userConfig.mode;

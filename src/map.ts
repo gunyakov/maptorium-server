@@ -15,7 +15,7 @@ import { Tile, MapInfo, NetworkConfig } from "./interface";
 //------------------------------------------------------------------------------
 class MapHandler {
 
-  protected storage = process.cwd();
+  protected storage = process.cwd() + "/..";
   protected _mapVersion = 0;
   //To overwrite in Extended class
   protected _info:MapInfo = {

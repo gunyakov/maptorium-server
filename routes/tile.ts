@@ -21,11 +21,11 @@ import { DownloadMode, LogModules } from '../src/enum';
 import { checkMapHandler, getMapHandler } from '../maps';
 import MapHandler from '../src/map';
 let url = require('url');
+import stat from "../src/statistics";
 //------------------------------------------------------------------------------
 //Tile request handler
 //------------------------------------------------------------------------------
 async function tileRequestHandler(map:string, x:number, y:number, z:number, mode:DownloadMode, res:Response):Promise<void> {
-  //console.log(map, x, y, z, mode);
   //Устанавливаем максимальное значение координат тайла
   let maxTileNumber = 1;
   //Изменяем максимальный номер тайла в соответсвии с уровнем увеличения
@@ -47,21 +47,24 @@ async function tileRequestHandler(map:string, x:number, y:number, z:number, mode
   }
   else {
     let mapHandler = getMapHandler(map) as MapHandler;
-
     let [tileInDB, tileInfo] = await mapHandler.checkTile(z, x, y, true);
     //If tile in DB and no need update tile in force mode
     if(mode != DownloadMode.force && tileInDB == true) {
+      stat.skip++;
       //Retrun tile from DB
         res.writeHead(200, {'Content-Type': mapHandler.getInfo().content, "Content-Length": tileInfo.s});
         res.end(tileInfo.b);
         return;
     } 
+    stat.queue++;
     //If tile not in DB and network isn disable
     if(mode != DownloadMode.disable && !tileInDB) {
       //Download tile there
       let [code, tile, size]  = await mapHandler.download(z, x, y, config.network);
       //If tile was downloaded
       if(code == 200) {
+        stat.download++;
+        stat.size += size;
         //Return tile
         res.writeHead(200, {'Content-Type': mapHandler.getInfo().content, "Content-Length": size});
         res.end(tile);
@@ -71,6 +74,7 @@ async function tileRequestHandler(map:string, x:number, y:number, z:number, mode
         //Return empty tile
         res.sendFile(process.cwd() + "/default.png");
       }
+      stat.queue--;
       return;
     }
     //If tile in DB but tile must be updated in force mode
@@ -80,6 +84,8 @@ async function tileRequestHandler(map:string, x:number, y:number, z:number, mode
       let [code, tile, size]  = await mapHandler.update(z, x, y, config.network);
       //If tile was updated
       if(code == 200) {
+        stat.download++;
+        stat.size += size;
         //Return tile
         res.writeHead(200, {'Content-Type': mapHandler.getInfo().content, "Content-Length": size});
         res.end(tile);
@@ -89,6 +95,7 @@ async function tileRequestHandler(map:string, x:number, y:number, z:number, mode
         //Return empty tile
         res.sendFile(process.cwd() + "/default.png");
       }
+      stat.queue--;
       return;
     }
     //In all other cases return empty tile

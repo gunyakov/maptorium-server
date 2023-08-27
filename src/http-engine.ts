@@ -108,7 +108,7 @@ export default class httpEngine {
           thisClass._code = 200;
           thisClass._response = response.data as string;
           //@ts-ignore
-          thisClass._byteLength = +response.headers?.['content-length'] || 0;
+          thisClass._byteLength = +response.headers?.['content-length'] || Buffer.from(response.data).byteLength;
           //Return data from url
           resolve(true);
         }).catch(async function (error) {

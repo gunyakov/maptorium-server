@@ -109,4 +109,22 @@ router.post("/sample", async function(req, res) {
     else res.json({result: "warning", message: "Cant read time value. Skip."});
 });
 
+router.get("/start", async function(req, res) {
+    if(await GPS.start()) {
+        res.json({result: "success", message: "GPS Service started."});
+    }
+    else {
+        res.json({result: "error", message: "Error to start GPS Service,"});
+    }
+});
+
+router.get("/stop", async function(req, res) {
+    if(await GPS.stop()) {
+        res.json({result: "success", message: "GPS Service stoped."});
+    }
+    else {
+        res.json({result: "error", message: "Error to stop GPS Service,"});
+    }
+});
+
 export default router;
