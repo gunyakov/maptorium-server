@@ -39,12 +39,12 @@ This is HTTP + Socket.IO API server what can do next:
     - Yandex Hybrid (rasted)
     - Any other maps what you can imagine and add.
 
-This is a part of Maptorium project. Must work with 
+This is a part of Maptorium project. Must work with
 Maptorium HTML UI to have all this features avaliable.
 
 ### Installation
 
-#### Linux / Windows users 
+#### Linux / Windows users
 
 You must have NodeJS 16 version minimum installed in system to run this server.
 
@@ -76,7 +76,7 @@ npm install https://github.com/mapbox/node-sqlite3/tarball/master
 
 If you run `npm run prepare` before, you already have Leaflet UI installed and ready to use. But you can select another UI in list and install it manualy. Installation same as static folder for Express.
 
-| Engine | Link | Descirption | 
+| Engine | Link | Descirption |
 | - | - | - |
 | Leaflet | [Download](https://github.com/gunyakov/maptorium-leaflet) | Based on Leaflet engine. 2D map. very close to [SAS Planet](https://sasgis.org) |
 | Cesium  | [Download](https://github.com/gunyakov/maptorium-cesium) | Based on Cesium engine. 3D map, very close to Google Earth[^5]. |
@@ -92,6 +92,7 @@ Available v1.0.0-beta-win-x64 portable version with Lealfet UI for Windows users
 - [ ] COM Nmea devices support for Win and Linux
 - [ ] POI Categories Support
 - [ ] Ability to set all server config from UI
+- [ ] Multi language support
 
 [^1]: Server can download tiles but Leaflet UI still cant render ArcGis vector tiles as I cant find proper library for this map type to be compatible with last Leaflet release.
 
@@ -101,4 +102,4 @@ Available v1.0.0-beta-win-x64 portable version with Lealfet UI for Windows users
 
 [^4]: Not yet tested as i have no such device.
 
-[^5]: Limited functionality as I still didn`t finish this part. 
+[^5]: Limited functionality as I still didn`t finish this part.

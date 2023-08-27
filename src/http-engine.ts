@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //Axios
 //------------------------------------------------------------------------------
-import axios, { AxiosRequestConfig, AxiosResponse, Method, ResponseType } from "axios";
+import axios, { AxiosRequestConfig, Method, ResponseType } from "axios";
 //------------------------------------------------------------------------------
 //Socks Proxy Agent Generator
 //------------------------------------------------------------------------------
@@ -105,9 +105,10 @@ export default class httpEngine {
         axios(axiosConfig).then(async function (response) {
           //Show message
           Log.info(LogModules.http, axiosConfig.url as string);
+          thisClass._code = 200;
           thisClass._response = response.data as string;
           //@ts-ignore
-          thisClass._byteLength = response.byteLength;
+          thisClass._byteLength = +response.headers?.['content-length'] || 0;
           //Return data from url
           resolve(true);
         }).catch(async function (error) {
@@ -118,6 +119,7 @@ export default class httpEngine {
             switch (error.response.status) {
               case 404:
                 Log.warning(LogModules.http, error.response.status + " " + error.response.statusText);
+                thisClass._code = 404;
                 resolve(true);
                 break;
               case 403:

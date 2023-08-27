@@ -14,8 +14,6 @@ export default {
 
   INSERT_POI: "INSERT INTO poi('categoryID', 'name', 'type', 'color', 'fillColor', 'fillOpacity', 'visible') VALUES(?, ?, ?, ?, ?, ?, 1);",
 
-  UPDATE_POI: "UPDATE poi SET SWx = ?, SWy = ?, NEx = ?, NEy = ? WHERE ID = ?;",
-
   INSERT_POINTS: "INSERT INTO points('poiID', 'lat', 'lng') VALUES (?, ?, ?);",
 
   DELETE_POI_BY_ID: "DELETE FROM poi WHERE ID = ?;",
@@ -23,8 +21,6 @@ export default {
   DELETE_POINTS_BY_POI: "DELETE FROM points WHERE poiID = ?;",
 
   UPDATE_POI_STYLE: "UPDATE poi SET categoryID = ?, name = ?, width = ?, fillOpacity = ?, color = ?, fillColor = ? WHERE ID = ?;",
-
-  UPDATE_POI_BOUNDS: "UPDATE poi SET SWx = ?, SWy = ?, NEx = ?, NEy = ?, zoom = ? WHERE ID = ?;",
 
   SELECT_CATEGORY_LIST: "SELECT * FROM category;",
 
@@ -54,6 +50,53 @@ export default {
 
   UPDATE_TILE: "UPDATE t SET v = ?, s = ?, h = ?, d = ?, b = ? WHERE x = ? AND y = ?;",
 
-  MBTILES_SELECT: "SELECT * FROM tiles WHERE zoom_level = ? AND tile_column = ? AND tile_row = ?;"
+  MBTILES_SELECT: "SELECT * FROM tiles WHERE zoom_level = ? AND tile_column = ? AND tile_row = ?;",
+
+  CREATE_DB_1: `CREATE TABLE "category" (
+    "ID"	INTEGER UNIQUE,
+    "name"	TEXT NOT NULL,
+    "parentID"	INTEGER,
+    "order"	INTEGER NOT NULL DEFAULT 1,
+    PRIMARY KEY("ID" AUTOINCREMENT)
+  )`,
+  CREATE_DB_2: `CREATE TABLE "messages" (
+    "ID"	INTEGER UNIQUE,
+    "message"	TEXT,
+    "readed"	INTEGER DEFAULT 0,
+    "date"	INTEGER,
+    PRIMARY KEY("ID" AUTOINCREMENT)
+  )`,
+  CREATE_DB_3: `CREATE TABLE "poi" (
+    "ID"	INTEGER UNIQUE,
+    "categoryID"	INTEGER NOT NULL,
+    "name"	TEXT NOT NULL,
+    "type"	TEXT NOT NULL,
+    "color"	TEXT,
+    "width"	INTEGER NOT NULL DEFAULT 1,
+    "fillColor"	TEXT,
+    "fillOpacity"	REAL,
+    "visible"	INTEGER,
+    PRIMARY KEY("ID" AUTOINCREMENT)
+  )`,
+  CREATE_DB_4: `CREATE TABLE "points" (
+    "ID"	INTEGER UNIQUE,
+    "poiID"	INTEGER,
+    "lat"	INTEGER,
+    "lng"	INTEGER,
+    PRIMARY KEY("ID" AUTOINCREMENT)
+  )`,
+  CREATE_DB_5: `CREATE TABLE "routeCoords" (
+    "ID"	INTEGER NOT NULL UNIQUE,
+    "routeID"	INTEGER NOT NULL,
+    "lat"	REAL NOT NULL,
+    "lng"	REAL NOT NULL,
+    "date"	INTEGER,
+    PRIMARY KEY("ID" AUTOINCREMENT)
+  )`,
+  CREATE_DB_6: `CREATE TABLE "routeList" (
+    "ID"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+    "name"	TEXT,
+    "distance"	INTEGER
+  )`,
   
 } as {[id:string]: string}

@@ -1,1 +1,1 @@
-{"map":"googlesat","layers":["mapbox"],"lat":-26.547994092666016,"lng":-23.516235351562504,"zoom":9,"showRoute":true,"recordRoute":true,"gpsSampleTime":1200,"mode":"disable","jobManager":false,"GPSInfoPanel":false,"distanceToGo":"8179"}
+{"map":"googlesat","layers":["mapbox"],"lat":-24.489648077028683,"lng":-45.99151611328126,"zoom":8,"showRoute":true,"recordRoute":false,"gpsSampleTime":1200,"mode":"enable","jobManager":false,"GPSInfoPanel":false,"distanceToGo":"8179"}

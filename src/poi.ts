@@ -14,6 +14,10 @@ import { LogModules } from "./enum";
 import { sendRoutePoint } from "./io";
 import { POIType } from "./enum";
 //------------------------------------------------------------------------------
+//NodeJS core file system functions
+//------------------------------------------------------------------------------
+import { existsSync } from 'fs';
+//------------------------------------------------------------------------------
 //General POI storage
 //------------------------------------------------------------------------------
 class POIHandler {
@@ -22,6 +26,24 @@ class POIHandler {
   private _routeID:number = 0;
 
   constructor(){
+    this.checkDB();
+  }
+
+  async checkDB() {
+    if(!existsSync(this._dbName)) {
+      if(await sqlite3.open(this._dbName)) {
+        await sqlite3.run(this._dbName, "CREATE_DB_1");
+        await sqlite3.run(this._dbName, "CREATE_DB_2");
+        await sqlite3.run(this._dbName, "CREATE_DB_3");
+        await sqlite3.run(this._dbName, "CREATE_DB_4");
+        await sqlite3.run(this._dbName, "CREATE_DB_5");
+        await sqlite3.run(this._dbName, "CREATE_DB_6");
+        Log.success(LogModules.poi, "POI DB was created.");
+      }
+      else {
+        Log.error(LogModules.poi, "Cant make POI DB. Pls check location.");
+      }
+    }
     this.routeGetID();
   }
   //------------------------------------------------------------------------------
@@ -93,10 +115,6 @@ class POIHandler {
 
     let lastID = await sqlite3.run(this._dbName, "INSERT_POI", SQLValues) as number;
     if(lastID > 0) {
-      // if(poi.bounds) {
-      //   SQLValues = [poi.bounds._southWest.lat, poi.bounds._southWest.lng, poi.bounds._northEast.lat, poi.bounds._northEast.lng, lastID];
-      //   await sqlite3.run(this._dbName, "UPDATE_POI", SQLValues);
-      // }
       await this.savePoints(lastID, poi.points);
       return lastID;
     }

@@ -74,16 +74,16 @@ export default {
     //Both - Print log message in console and send to remote UI
     //************************************************* */
     TSTOR: {
-      success: LogShow.disable,
-      info: LogShow.disable,
+      success: LogShow.console,
+      info: LogShow.console,
       error: LogShow.console,
       warning: LogShow.console
     },
     MAP: {
-      success: LogShow.disable,
-      info: LogShow.disable,
+      success: LogShow.console,
+      info: LogShow.console,
       error: LogShow.console,
-      warning: LogShow.disable
+      warning: LogShow.console
     },
     SQLITE3: {
       success: LogShow.disable,
