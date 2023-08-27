@@ -55,8 +55,6 @@ cd maptorium-server
 
 npm install
 
-npm run prepare
-
 npm run start
 ```
 
@@ -85,7 +83,7 @@ You can write your own UI using server [API](./API.md) to get data and tiles.
 
 #### Windows users
 
-Available v1.0.0-beta-win-x64 portable version with Lealfet UI for Windows users. You can download it [here](https://github.com/gunyakov/maptorium-server/releases/tag/1.0.0)
+Available v2.0.1-win-x64 portable version with Lealfet UI for Windows users. You can download it [here](https://github.com/gunyakov/maptorium-server/releases/tag/v2.0.1)
 
 ## To Do
 
