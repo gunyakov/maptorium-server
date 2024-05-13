@@ -3,28 +3,28 @@
 //------------------------------------------------------------------------------
 import map from "../src/map";
 //------------------------------------------------------------------------------
-//Exstention to hande Google Sat Map
+//Exstention to hande OSM maps
 //------------------------------------------------------------------------------
 class ExtMap extends map {
   constructor() {
     super();
 
-    this.storage += "/storage/yandex_hyb";
+    this.storage += "/storage/maptorium";
     this._info = {
-      id: "yandexhyb",
+      id: "maptorium",
       type: "layer",
-      name: "Yandex Hybrid",
-      submenu: "Yandex",
+      name: "Maptorium Vector",
+      submenu: "Maptorium",
       tileSize: 256,
-      attribution: "Hybrid (Yandex.Maps)",
-      content: "image/png",
-      format: "rasted",
-      encoding: "none",
+      attribution: "",
+      content: "application/x-protobuf",
+      format: "vector",
+      encoding: "gzip",
     };
   }
 
   async getURL(z: number, x: number, y: number): Promise<string> {
-    let url = `https://core-renderer-tiles.maps.yandex.net/tiles?l=skl&x=${x}&y=${y}&z=${z}&scale=1&lang=ru_RU`;
+    let url = `http://127.0.0.1:9010/${z}/${x}/${y}.pbf`;
     return url;
   }
 }

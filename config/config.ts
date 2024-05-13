@@ -6,60 +6,57 @@ export default {
     //Listen port
     port: 9009,
     //Threads for http request
-    threads: 1,
+    threads: 4,
   },
   db: {
     //Prevent write in DB any tiles in any mode
     ReadOnly: false,
     //Idle time in seconds to close DB file if idle
-    OpenTime: 15
+    OpenTime: 30,
   },
   network: {
     //(enable, disable, force)
-    state: DownloadMode.disable,
-      //Request for mass tile download
+    state: DownloadMode.enable,
     request: {
-      //Delay in ms between HTTP requests when tiles download
-      delay: 3, 
-      //Abort request if pass more than ms
+      userAgent:
+        "Mozilla/5.0 (X11; Linux x86_64; rv:96.0) Gecko/20100101 Firefox/96.0",
       timeout: 30000,
-      //User Agent
-      userAgent: 'Mozilla/5.0 (X11; Linux x86_64; rv:96.0) Gecko/20100101 Firefox/96.0'
+      delay: 3,
     },
+    banTimeMode: false,
     proxy: {
-      //Use proxy or not (true or false)
       enable: false,
-      //Enable tor change ID
-      tor: false,
-      //Type of proxy(socks, socks4, socks5, http, https)
-      protocol: ProxyProtocol.http,
-      //Host can be IP or domain
-      host: '127.0.0.1',
-      //Port
-      port: 9099,
+      server: {
+        protocol: ProxyProtocol.http,
+        host: "127.0.0.1",
+        port: 9099,
+      },
+      authRequired: false,
       auth: {
-        username: 'test',
-        password: 'test',
-        tor: {
-          HashedControlPassword: "16:872860B76453A77D60CA2BB8C1A7042072093276A3D701AD684053EC4C",
-          ControlPort: 9051
-        }
-      }
-    }
+        username: "test",
+        password: "test",
+      },
+      tor: {
+        enable: false,
+        HashedControlPassword:
+          "16:872860B76453A77D60CA2BB8C1A7042072093276A3D701AD684053EC4C",
+        ControlPort: 9051,
+      },
+    },
   },
   downloader: {
     //Update tiles if Exist in DB
-    updateTiles: false, 
+    updateTiles: false,
     //Update tiles if exist in DB and have different size
-    updateDifferent: false, 
+    updateDifferent: false,
     //Update tiles if some time pass from last downloading
-    updateDateTiles: false, 
+    updateDateTiles: false,
     //Mark tiles empty if 404 get from server during download
-    emptyTiles: true, 
+    emptyTiles: true,
     //Check from server tiles what was marked like empty id DB
-    checkEmptyTiles: false, 
+    checkEmptyTiles: false,
     //Udpate tiles what marked empty and if some time pass from last check
-    updateDateEmpty: false
+    updateDateEmpty: false,
   },
   //----------------------------------------------------------------------------
   //Log service
@@ -75,51 +72,51 @@ export default {
     //************************************************* */
     TSTOR: {
       success: LogShow.console,
-      info: LogShow.console,
+      info: LogShow.disable,
       error: LogShow.console,
-      warning: LogShow.console
+      warning: LogShow.console,
     },
     MAP: {
       success: LogShow.console,
       info: LogShow.console,
       error: LogShow.console,
-      warning: LogShow.console
+      warning: LogShow.console,
     },
     SQLITE3: {
       success: LogShow.disable,
       info: LogShow.console,
       error: LogShow.console,
-      warning: LogShow.console
+      warning: LogShow.console,
     },
     HTTP: {
       success: LogShow.disable,
       info: LogShow.disable,
       error: LogShow.console,
-      warning: LogShow.disable
+      warning: LogShow.disable,
     },
     GPS: {
       success: LogShow.both,
       info: LogShow.console,
       error: LogShow.console,
-      warning: LogShow.console
+      warning: LogShow.console,
     },
     MAIN: {
       success: LogShow.both,
       info: LogShow.console,
       error: LogShow.console,
-      warning: LogShow.console
+      warning: LogShow.console,
     },
     POI: {
       success: LogShow.console,
       info: LogShow.disable,
       error: LogShow.console,
-      warning: LogShow.console
+      warning: LogShow.console,
     },
     WORKER: {
       success: LogShow.console,
       info: LogShow.console,
       error: LogShow.console,
-      warning: LogShow.console
-    }
-  }
+      warning: LogShow.console,
+    },
+  },
 };

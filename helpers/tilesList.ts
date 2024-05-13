@@ -17,35 +17,35 @@ import POI from "../src/poi";
 //----------------------------------------------------------------------------
 //Generate tiles list for job list
 //----------------------------------------------------------------------------
-export default async function tileList(bbox:Array<number>, polygon:turf.helpers.Feature<turf.helpers.Polygon>):Promise<Array<TileInfo>> {
+export default async function tileList(bbox:Array<number>, polygon:turf.helpers.Feature<turf.helpers.Polygon>, tileSize:number):Promise<Array<TileInfo>> {
 
     let arrJobTilesList:Array<TileInfo> = [];
     
     //Convert Map Pixel To Tile XY coords
-    var startX = Math.floor(bbox[0] / 256);
-    var startY = Math.floor(bbox[1] / 256);
-    var stopX = Math.ceil(bbox[2] / 256);
-    var stopY = Math.ceil(bbox[3] / 256);
+    var startX = Math.floor(bbox[0] / tileSize);
+    var startY = Math.floor(bbox[1] / tileSize);
+    var stopX = Math.ceil(bbox[2] / tileSize);
+    var stopY = Math.ceil(bbox[3] / tileSize);
     //Generate tiles list by polygon bounds
     for(let x = startX; x < stopX; x++) {
         for(let y = startY; y < stopY; y++) {
             //Init tile inside polygon state
             let tileInside = false;
             //Check all 4 corners to be inside polygon
-            if(turf.booleanPointInPolygon([ x * 256, y * 256 ], polygon)) {
+            if(turf.booleanPointInPolygon([ x * tileSize, y * tileSize ], polygon)) {
                 //Set tile state inside
                 tileInside = true;
             }
             
-            if(turf.booleanPointInPolygon([ x * 256 + 256, y * 256 ], polygon)) {
+            if(turf.booleanPointInPolygon([ x * tileSize + tileSize, y * tileSize ], polygon)) {
                 //Set tile state inside
                 tileInside = true;
             }
-            if(turf.booleanPointInPolygon([ x * 256 + 256, y * 256 + 256], polygon)) {
+            if(turf.booleanPointInPolygon([ x * tileSize + tileSize, y * tileSize + tileSize], polygon)) {
                 //Set tile state inside
                 tileInside = true;
             }
-            if(turf.booleanPointInPolygon([ x * 256, y * 256 + 256], polygon)) {
+            if(turf.booleanPointInPolygon([ x * tileSize, y * tileSize + tileSize], polygon)) {
                 //Set tile state inside
                 tileInside = true;
             }
@@ -62,18 +62,18 @@ export default async function tileList(bbox:Array<number>, polygon:turf.helpers.
     return arrJobTilesList;
 }
 
-export async function tilesListByPOI(poiID:number, zoom:number):Promise<Array<TileInfo>> {
+export async function tilesListByPOI(poiID:number, zoom:number, tileSize:number):Promise<Array<TileInfo>> {
     Log.success(LogModules.worker, `Start calculation tiles list for Polygon ${poiID} and Zoom ${zoom}`);
     let arrJobTilesList:Array<TileInfo> = [];
     let poi = await POI.get(poiID) as Array<POIInfo>;
     if(poi) {
-        arrJobTilesList = await tileListByPolygon(poi[0].points, zoom);
+        arrJobTilesList = await tileListByPolygon(poi[0].points, zoom, tileSize);
     }
     Log.success(LogModules.worker, `Calculation of tiles list is finished. Total ${arrJobTilesList.length} tiles.`);
     return arrJobTilesList;
 }
 
-export async function tileListByPolygon(points:Array<GPSCoords>, requiredZoom:number):Promise<Array<TileInfo>> {
+export async function tileListByPolygon(points:Array<GPSCoords>, requiredZoom:number, tileSize:number):Promise<Array<TileInfo>> {
     
     let arrJobTilesList:Array<TileInfo> = [];
     //Convert polygone point to Turf points
@@ -97,7 +97,7 @@ export async function tileListByPolygon(points:Array<GPSCoords>, requiredZoom:nu
         return arrJobTilesList;
     }
 
-    arrJobTilesList = await tileList(bbox, polygon);
+    arrJobTilesList = await tileList(bbox, polygon, tileSize);
     
     for(let i = 0; i < arrJobTilesList.length; i++) {
         arrJobTilesList[i].z = requiredZoom;

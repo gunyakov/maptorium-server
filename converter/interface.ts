@@ -1,0 +1,1 @@
+interface Tile {zoom_level: number, tile_column: number, tile_row: number,tile_data: Buffer }

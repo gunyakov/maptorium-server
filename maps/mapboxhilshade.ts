@@ -3,28 +3,29 @@
 //------------------------------------------------------------------------------
 import map from "../src/map";
 //------------------------------------------------------------------------------
-//Exstention to hande Google Sat Map
+//Exstention to hande OSM maps
 //------------------------------------------------------------------------------
 class ExtMap extends map {
   constructor() {
     super();
 
-    this.storage += "/storage/yandex_hyb";
+    this.storage += "/storage/mapboxhillshade";
     this._info = {
-      id: "yandexhyb",
+      id: "mapboxhillshade",
       type: "layer",
-      name: "Yandex Hybrid",
-      submenu: "Yandex",
-      tileSize: 256,
-      attribution: "Hybrid (Yandex.Maps)",
-      content: "image/png",
+      name: "Hillshade",
+      submenu: "MapBOX",
+      tileSize: 512,
+      attribution: "",
+      content: "image/webp",
       format: "rasted",
       encoding: "none",
     };
   }
 
   async getURL(z: number, x: number, y: number): Promise<string> {
-    let url = `https://core-renderer-tiles.maps.yandex.net/tiles?l=skl&x=${x}&y=${y}&z=${z}&scale=1&lang=ru_RU`;
+    z--;
+    let url = `https://api.maptiler.com/tiles/hillshade/${z}/${x}/${y}.webp?key=gbetYLSD5vR8MdtZ88AQ`;
     return url;
   }
 }

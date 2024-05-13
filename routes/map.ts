@@ -24,7 +24,7 @@ import JobManager from "../src/jobmanager";
 //------------------------------------------------------------------------------
 //Map Handler checker
 //------------------------------------------------------------------------------
-import { checkMapHandler } from '../maps';
+import { checkMapHandler, getMapHandler } from '../maps';
 //------------------------------------------------------------------------------
 //Express Router
 //------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ router.post("/cached/poi", async(req, res) => {
     //Wait until abort tile cheking
     await abortTileChecking();
     //Start map cache checking
-    getCachedMapByPOI(poiID, zoom, map);
+    getCachedMapByPOI(poiID, zoom, map, getMapHandler(map).getInfo().tileSize);
     res.json({result: "success", message: "Cached map building started. Wait until result."});
 });
 
@@ -105,7 +105,7 @@ router.post("/cached/bbox", async(req, res) => {
     //Wait until abort tile cheking
     await abortTileChecking();
     //Start map cache checking
-    getCachedMapByBBOX(bbox, zoom, map);
+    getCachedMapByBBOX(bbox, zoom, map, getMapHandler(map).getInfo().tileSize);
     res.json({result: "success", message: "Cached map building started. Wait until result."});
 });
 

@@ -3,28 +3,29 @@
 //------------------------------------------------------------------------------
 import map from "../src/map";
 //------------------------------------------------------------------------------
-//Exstention to hande Google Sat Map
+//Exstention to hande OSM maps
 //------------------------------------------------------------------------------
 class ExtMap extends map {
   constructor() {
     super();
 
-    this.storage += "/storage/yandex_hyb";
+    this.storage += "/storage/mapbox3d";
     this._info = {
-      id: "yandexhyb",
+      id: "mapbox3d",
       type: "layer",
-      name: "Yandex Hybrid",
-      submenu: "Yandex",
+      name: "MapBox 3D Tiles",
+      submenu: "MapBOX",
       tileSize: 256,
-      attribution: "Hybrid (Yandex.Maps)",
-      content: "image/png",
-      format: "rasted",
+      attribution: "",
+      content: "application/x-protobuf",
+      format: "vector",
       encoding: "none",
     };
   }
 
   async getURL(z: number, x: number, y: number): Promise<string> {
-    let url = `https://core-renderer-tiles.maps.yandex.net/tiles?l=skl&x=${x}&y=${y}&z=${z}&scale=1&lang=ru_RU`;
+    //let url = `http://127.0.0.1:9010/${z}/${x}/${y}.pbf`;
+    let url = `https://api.mapbox.com/v4/mapbox.mapbox-bathymetry-v2,mapbox.mapbox-streets-v8,mapbox.mapbox-terrain-v2,mapbox.mapbox-models-v1/${z}/${x}/${y}.vector.pbf?sku=101EqLAievT4q&access_token=pk.eyJ1IjoibWFwYm94LW1hcC1kZXNpZ24iLCJhIjoiY2xrc2pzc2VuMDFybTNlcXQwOG9ieXFxeSJ9.tFV8YJxUOkHxcaZ70BQiUg`;
     return url;
   }
 }

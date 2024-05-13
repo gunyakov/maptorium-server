@@ -94,7 +94,7 @@ class Generator {
       //If max zoom les than base zoom for generator skip running
       if(zoom < this._fromZoom) {
         //Create tile list for zoom level
-        let tempArr = await tilesListByPOI(parseInt(this._jobConfig.polygonID), zoom);
+        let tempArr = await tilesListByPOI(parseInt(this._jobConfig.polygonID), zoom, this._mapHandler.getInfo().tileSize);
         //If create tile list for current zoom
         if(Array.isArray(tempArr)) {
           //Add tiles list to main Array

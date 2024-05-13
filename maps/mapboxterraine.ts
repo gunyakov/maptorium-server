@@ -6,11 +6,10 @@ import map from "../src/map";
 //Exstention to hande OSM maps
 //------------------------------------------------------------------------------
 class ExtMap extends map {
-
   constructor() {
     super();
 
-    this.storage += '/storage/mapboxterraine';
+    this.storage += "/storage/mapboxterraine";
     this._info = {
       id: "mapboxterraine",
       type: "layer",
@@ -19,13 +18,14 @@ class ExtMap extends map {
       tileSize: 512,
       attribution: "",
       content: "image/webp",
-      format: "rasted"
+      format: "rasted",
+      encoding: "none",
     };
   }
 
-  async getURL(z:number, x:number, y:number):Promise<string> {
+  async getURL(z: number, x: number, y: number): Promise<string> {
     z--;
-    let url = `https://api.maptiler.com/tiles/hillshade/${z}/${x}/${y}.webp?key=gbetYLSD5vR8MdtZ88AQ`
+    let url = `https://api.maptiler.com/tiles/terrain-rgb-v2/${z}/${x}/${y}.webp?key=Te86e6irxQ673m7olJqV`;
     return url;
   }
 }

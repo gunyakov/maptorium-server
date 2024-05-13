@@ -1,52 +1,57 @@
-# maptorium-server
+# maptorium-server 3.0.0
+
+Maptorium 3.0 is available now. Complete new UI with vector map supports and other improvements.
+
+![Maptorium](./main.png)
+
+Latest Chrome is highly recommended for Maptorium UI and WebGL support
 
 [Join Telegram Groupe to contribute or ask questions](https://t.me/maptorium)
 
-Not all features tested in real life. Thats why as much people contribute to testing, as fast I will make stable release.
-
 ### Description
 
-This is HTTP + Socket.IO API server what can do next:
+This is HTTP + Socket. IO API Server what can do next:
 
-1. Make any tiles cache to use such cache offline.
-    - Rasted tiles support (JPEG/PNG).
-    - Vector tiles support (MapBox, ArcGis[^1]).
-    - Any other types what can be rendered by UI.
-    - Cache DB is fully compatible with [SAS Planet](https://sasgis.org) sqlite storage.
-2. Records GPS routes from different sources.
-    - Custom GPS HTML server[^3].
-    - TCP NMEA Server.
-    - USB/COM NMEA devices[^4].
-3. Store POI (polyline, polygon, point) in DB.
-4. Make mass tiles downloads with reach options.
-    - HTTP/HTTPS/Socks support
-    - TOR support including New ID getting.
-    - Different options to check tile age, state and so one.
-5. Generate from downloaded tiles upper zoom levels.
-6. Generate cached map info (info about missed/downloaded/empty tiles) for selected area.
-7. Next maps support from box:
-    - ArcGis Elevation (rasted)
-    - ArcGis Satelite (rasted)
-    - ArcGis Vector as hybrid overlay (vector)[^1]
-    - Google Satelite (rasted)
-    - Google Hybrid Ru version (rasted)
-    - Google Hybrid Eng version (rasted)
-    - MapBox as Hybrid overlay (vector)[^2]
-    - MapBox Terraine (rasted)
-    - OSM (rasted)
-    - OSM Marine as overlay.
-    - Yandex Satelite (rasted)
-    - Yandex Hybrid (rasted)
-    - Any other maps what you can imagine and add.
+1. Make each tile cache to use such cache offline.
+   - Support for rasterized tiles (JPEG/PNG).
+   - Support for vector tiles (MapBox, ArcGis, Maptorium).
+   - All other types that can be rendered by UI.
+   - Cache DB is fully compatible with [SAS Planet](https://sasgis.org) sqlite storage.
+2. Records GPS routes from various sources.
+   - Custom GPS HTML server[^1].
+   - TCP NMEA Server.
+3. Storage of POI (polyline, polygon, point) in DB.
+4. Perform mass downloads of tiles with range options.
+   - HTTP/HTTPS/Socks support
+   - TOR get support including New ID.
+   - Various options to check tile age, status and so on.
+5. Generate upper zoom levels from downloaded tiles.
+6. Creates cached map information (information about missed/downloaded/empty tiles) for the selected area.
+7. Supports next maps out of the box:
+   - ArcGis Elevation (gridded)
+   - ArcGis Satelite (rasterized)
+   - ArcGis Vector as hybrid overlay (vector)
+   - Google Satelite (rasterized)
+   - Google Hybrid Ru Version (rasterized)
+   - Google Hybrid Eng Version (rasterized)
+   - MapBox as hybrid overlay (vector)
+   - MapBox Terraine (rasterized)
+   - OSM (rasterized)
+   - OSM Marine as overlay.
+   - Yandex Satelite (rasterized)
+   - Yandex Hybrid (rasterized)
+   - Any other map you can think of and add.
 
 This is a part of Maptorium project. Must work with
-Maptorium HTML UI to have all this features avaliable.
+Maptorium HTML UI to have all these features available.
 
 ### Installation
 
-#### Linux / Windows users
+#### Linux/Windows users
 
-You must have NodeJS 16 version minimum installed in system to run this server.
+You must have at least version 16 of NodeJS installed in the system to run this server.
+
+This installation is suitable for development purposes. If you look for 'ready for use' code, see `Pre Compiled code` section
 
 ```
 git clone https://github.com/gunyakov/maptorium-server.git
@@ -62,7 +67,7 @@ npm run start
 
 <summary>SQLite3 module compilation error</summary>
 
-If you have any problems during SQLite3 module compilation, run next command
+If you have problems compiling the SQLite3 module, run the following command
 
 ```
 npm install https://github.com/mapbox/node-sqlite3/tarball/master
@@ -70,34 +75,21 @@ npm install https://github.com/mapbox/node-sqlite3/tarball/master
 
 </details>
 
-#### UI Installation
+#### Pre Compiled code
 
-If you run `npm run prepare` before, you already have Leaflet UI installed and ready to use. But you can select another UI in list and install it manualy. Installation same as static folder for Express.
+Project is write with Type Script. If you don't want to compile server and UI code into JS, you can download precompiled code from release section [here](https://github.com/gunyakov/maptorium-server/releases/tag/v3.0.0)
 
-| Engine | Link | Descirption |
-| - | - | - |
-| Leaflet | [Download](https://github.com/gunyakov/maptorium-leaflet) | Based on Leaflet engine. 2D map. very close to [SAS Planet](https://sasgis.org) |
-| Cesium  | [Download](https://github.com/gunyakov/maptorium-cesium) | Based on Cesium engine. 3D map, very close to Google Earth[^5]. |
+Unpack archive, run `npm i` inside server folder and enjoy.
 
-You can write your own UI using server [API](./API.md) to get data and tiles.
+#### Windows lazy users
 
-#### Windows users
+For Windows users, the portable version v3.0.0-win-x64 with UI is available. You can download it [here](https://github.com/gunyakov/maptorium-server/releases/tag/v3.0.0)
 
-Available v2.0.1-win-x64 portable version with Lealfet UI for Windows users. You can download it [here](https://github.com/gunyakov/maptorium-server/releases/tag/v2.0.1)
+## To do
 
-## To Do
+- [ ] COM support of nmea devices for win and linux
+- [x] POI Manager (Maptorim 3.0)
+- [ ] Ability to set all server configurations from the user interface
+- [x] Support for multiple languages (maptorium 3.0)
 
-- [ ] COM Nmea devices support for Win and Linux
-- [ ] POI Categories Support
-- [ ] Ability to set all server config from UI
-- [ ] Multi language support
-
-[^1]: Server can download tiles but Leaflet UI still cant render ArcGis vector tiles as I cant find proper library for this map type to be compatible with last Leaflet release.
-
-[^2]: Possible to use as main map and not like overlay. But proper style must be connected to Leaflet UI. May be I will implement this in future release.
-
-[^3]: You must change code to get properly data from such server. Open file `gps/gps_core.ts`, find `getGPSCoords()` function and implement there your logic.
-
-[^4]: Not yet tested as i have no such device.
-
-[^5]: Limited functionality as I still didn`t finish this part.
+[^1]: You need to change the code to get the data from such a server. Open the file `gps/gps_core.ts`, find the function `getGPSCoords()` and implement your logic there.

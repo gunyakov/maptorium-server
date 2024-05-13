@@ -111,6 +111,7 @@ router.post("/sample", async function(req, res) {
 
 router.get("/start", async function(req, res) {
     if(await GPS.start()) {
+        setDefConfig('gpsServiceRun', true);
         res.json({result: "success", message: "GPS Service started."});
     }
     else {
@@ -120,6 +121,7 @@ router.get("/start", async function(req, res) {
 
 router.get("/stop", async function(req, res) {
     if(await GPS.stop()) {
+        setDefConfig('gpsServiceRun', false);
         res.json({result: "success", message: "GPS Service stoped."});
     }
     else {
