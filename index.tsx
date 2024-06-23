@@ -21,9 +21,13 @@ io(server);
 import Log from "./src/log";
 import { LogModules } from "./src/enum";
 //------------------------------------------------------------------------------
+//CORS requests enabling (for testing only)
+//------------------------------------------------------------------------------
+//const cors = require("cors");
+//app.use(cors());
+//------------------------------------------------------------------------------
 //Static files for browser map
 //------------------------------------------------------------------------------
-//app.use(express.static(path.join(ExecFolder, "..", "maptorium-leaflet")));
 app.use(express.static(path.join(ExecFolder, "..", "maptorium-maplibre")));
 app.post("/styles/bright.json", (req, res) => {
   res.sendFile(path.join(ExecFolder, "styles", "bright.json"));

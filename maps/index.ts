@@ -16,6 +16,7 @@ import osm from "./osm";
 import yandex from "./yandex";
 import yandexHyb from "./yandexHyb";
 import maptorium from "./maptorium";
+import sofiatraffic from "./sofiatraffic";
 
 let arrMaps: { [id: string]: MapHandler } = {};
 let arrMapsInfo: Array<MapInfo> = [];
@@ -44,6 +45,7 @@ initMap(yandexHyb);
 initMap(maptorium);
 initMap(mapbox3d);
 initMap(mapboxterraine);
+initMap(sofiatraffic);
 
 export function getMapHandler(mapID: string): MapHandler {
   return arrMaps[mapID];

@@ -46,14 +46,18 @@ async function tileRequestHandler(
   if (x > maxTileNumber || y > maxTileNumber) {
     Log.error(LogModules.main, "Tile request. Tile coords is out of max limit");
     //Пишем пустой тайл
-    res.sendFile(path.join(ExecFolder, "default.png"));
+    res.writeHead(404);
+    res.end();
+    //res.sendFile(path.join(ExecFolder, "default.png"));
   } else if (typeof map == "undefined" || !checkMapHandler(map)) {
     Log.error(
       LogModules.main,
       "Tile request. Map don't set or wrong map handler."
     );
     //Пишем пустой тайл
-    res.sendFile(path.join(ExecFolder, "default.png"));
+    res.writeHead(404);
+    res.end();
+    //res.sendFile(path.join(ExecFolder, "default.png"));
   } else {
     let mapHandler = getMapHandler(map) as MapHandler;
     let [tileInDB, tileInfo] = await mapHandler.checkTile(z, x, y, true);
@@ -93,7 +97,9 @@ async function tileRequestHandler(
       //If tile wasnt downloaded
       else {
         //Return empty tile
-        res.sendFile(path.join(ExecFolder, "default.png"));
+        res.writeHead(404);
+        res.end();
+        //res.sendFile(path.join(ExecFolder, "default.png"));
       }
       stat.queue--;
       return;
@@ -115,13 +121,17 @@ async function tileRequestHandler(
       //If tile wasnt updated
       else {
         //Return empty tile
-        res.sendFile(path.join(ExecFolder, "default.png"));
+        res.writeHead(404);
+        res.end();
+        //res.sendFile(path.join(ExecFolder, "default.png"));
       }
       stat.queue--;
       return;
     }
     //In all other cases return empty tile
-    res.sendFile(path.join(ExecFolder, "default.png"));
+    res.writeHead(404);
+    res.end();
+    //res.sendFile(path.join(ExecFolder, "default.png"));
   }
 }
 //------------------------------------------------------------------------------

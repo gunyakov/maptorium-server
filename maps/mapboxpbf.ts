@@ -24,7 +24,7 @@ class ExtMap extends map {
   }
 
   async getURL(z: number, x: number, y: number): Promise<string> {
-    let url = `https://api.maptiler.com/tiles/v3/${z}/${x}/${y}.pbf?key=Te86e6irxQ673m7olJqV`;
+    let url = `https://api.maptiler.com/tiles/v3-openmaptiles/${z}/${x}/${y}.pbf?key=wbw4tKDjEjT5EOx2fCDq`;
     return url;
   }
 }

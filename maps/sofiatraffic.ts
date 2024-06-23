@@ -3,28 +3,28 @@
 //------------------------------------------------------------------------------
 import map from "../src/map";
 //------------------------------------------------------------------------------
-//Exstention to hande OSM maps
+//Exstention to hande SofiaTraffic maps
 //------------------------------------------------------------------------------
 class ExtMap extends map {
   constructor() {
     super();
 
-    this.storage += "/storage/ArcGIS_Vector";
+    this.storage += "/storage/sofiatraffic";
     this._info = {
-      id: "arcgisvector",
+      id: "sofiatraffic",
       type: "layer",
-      name: "ArcGIS Vector",
-      submenu: "ArcGIS",
-      tileSize: 512,
+      name: "Sofia Traffic",
+      submenu: "Sofia Traffic",
+      tileSize: 256,
       attribution: "",
       content: "application/x-protobuf",
       format: "vector",
-      encoding: "gzip",
+      encoding: "none",
     };
   }
 
   async getURL(z: number, x: number, y: number): Promise<string> {
-    let url = `https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer/tile/${z}/${y}/${x}.pbf`;
+    let url = `https://www.sofiatraffic.bg/interactivecard/maps/sumc/${z}/${x}/${y}.vector.pbf`;
     return url;
   }
 }
