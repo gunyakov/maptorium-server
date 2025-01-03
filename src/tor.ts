@@ -3,7 +3,7 @@ let util = require("util");
 //------------------------------------------------------------------------------
 //Config
 //------------------------------------------------------------------------------
-import config from "../config/index";
+import config from "../config/config";
 
 class TorService {
   private _auth: string;

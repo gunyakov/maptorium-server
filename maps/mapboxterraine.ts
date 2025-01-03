@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 import map from "../src/map";
 //------------------------------------------------------------------------------
-//Exstention to hande OSM maps
+//Exstention to hande MAPBOX Terrain maps
 //------------------------------------------------------------------------------
 class ExtMap extends map {
   constructor() {
@@ -20,12 +20,13 @@ class ExtMap extends map {
       content: "image/webp",
       format: "rasted",
       encoding: "none",
+      apiKey: "",
     };
   }
 
   async getURL(z: number, x: number, y: number): Promise<string> {
     z--;
-    let url = `https://api.maptiler.com/tiles/terrain-rgb-v2/${z}/${x}/${y}.webp?key=Te86e6irxQ673m7olJqV`;
+    let url = `https://api.maptiler.com/tiles/terrain-rgb-v2/${z}/${x}/${y}.webp?key=${this._info.apiKey}`;
     return url;
   }
 }

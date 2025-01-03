@@ -4,13 +4,13 @@ import wait from "../helpers/wait";
 //MD5 to store DB file name in list
 //------------------------------------------------------------------------------
 let md5 = require("md5");
-const mbtiles = "/home/goodzon/Projects/maptorium-vectormap/map.mbtiles";
+const mbtiles = "/home/oleg/Project/Maptorium/maptorium-vectormap/map.mbtiles";
 
 import { Worker } from "worker_threads";
 
 //import TileStorage from "../DB/TileStorage";
 
-const storage = "/media/oleg/Video21/maptorium";
+const storage = "/media/oleg/Video2/maptorium";
 
 let processID: { [id: number]: boolean } = {};
 
@@ -23,7 +23,7 @@ let arrTiles: Array<Array<Tile>> = [];
 let tilesInDB = true;
 let offset = 0;
 let step = 1000000;
-let processes = 5;
+let processes = 1;
 let processesRun = false;
 let mainProcess = true;
 const db = new Database(mbtiles);
@@ -59,7 +59,7 @@ const stmt = db.prepare("SELECT * FROM tiles LIMIT ? OFFSET ?;");
 
 async function getTiles() {
   console.log(new Date().toLocaleString("en-GB"), "Start DB service function");
-  while (mainProcess) {
+  while (tilesInDB) {
     //If no tiles list in Array
     if (arrTiles.length < processes * 10) {
       console.log(

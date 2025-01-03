@@ -7,6 +7,7 @@ import {
   ProxyProtocol,
   TileInCache,
   JobType,
+  GPSType,
 } from "./enum";
 
 export type LogArray = {
@@ -81,6 +82,7 @@ export interface MapInfo {
   content: string;
   format: string;
   encoding: "gzip" | "none";
+  apiKey?: string;
 }
 
 export interface iNetworkConfig {
@@ -182,7 +184,8 @@ export interface UserConfig {
   mode: DownloadMode;
   jobManager: boolean;
   gpsServiceRun?: boolean;
-  gpsServer?: { host: string; port: number };
+  gpsServer?: GPSConfig;
+  apiKeys?: { [id: string]: string };
 }
 
 export interface CachedTilesList {
@@ -195,4 +198,11 @@ export interface MarkInfo {
   categoryID: number;
   name: string;
   points: Array<GPSCoords>;
+}
+
+export interface GPSConfig {
+  host: string;
+  port: number;
+  type: GPSType;
+  device: string;
 }

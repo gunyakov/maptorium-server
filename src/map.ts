@@ -5,7 +5,7 @@ import TileStorage from "../DB/TileStorage";
 //------------------------------------------------------------------------------
 //Config
 //------------------------------------------------------------------------------
-import configMain, { ExecFolder } from "../config/index";
+import configMain from "../config/index";
 //------------------------------------------------------------------------------
 //Axios with config
 //------------------------------------------------------------------------------
@@ -17,6 +17,7 @@ import { Tile, MapInfo, iNetworkConfig } from "./interface";
 //------------------------------------------------------------------------------
 //General map handler
 //------------------------------------------------------------------------------
+const ExecFolder = process.cwd();
 import path from "path";
 class MapHandler {
   protected storage = path.join(ExecFolder, "..");
@@ -32,6 +33,7 @@ class MapHandler {
     content: "image/png",
     format: "rasted",
     encoding: "none",
+    apiKey: "",
   };
 
   constructor() {}
@@ -183,6 +185,20 @@ class MapHandler {
     let byteLength = Buffer.byteLength(tile);
     //Insert or update tile in TileStorage
     return await TileStorage.update(z, x, y, this.storage, tile, byteLength);
+  }
+
+  /**
+   * Set Api Key for maps what required api key (like MapBox or Maptorium)
+   * @param apiKey - Key to access API
+   */
+  async setApiKey(apiKey: string) {
+    console.log(this._info.id, apiKey);
+    if (apiKey) this._info.apiKey = apiKey;
+  }
+
+  protected async _updateApiKey() {
+    if (configMain.apiKeys?.[this._info.id])
+      this._info.apiKey = configMain.apiKeys?.[this._info.id];
   }
 }
 

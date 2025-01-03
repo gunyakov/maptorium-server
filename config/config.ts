@@ -71,7 +71,7 @@ export default {
     //Both - Print log message in console and send to remote UI
     //************************************************* */
     TSTOR: {
-      success: LogShow.console,
+      success: LogShow.disable,
       info: LogShow.disable,
       error: LogShow.console,
       warning: LogShow.console,

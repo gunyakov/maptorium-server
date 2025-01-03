@@ -1,4 +1,4 @@
-const storagePath = "/media/oleg/Video21/maptorium";
+const storagePath = "/media/oleg/Video2/maptorium";
 
 //------------------------------------------------------------------------------
 //CRC32 to store tiles hash in DB

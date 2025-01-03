@@ -20,12 +20,13 @@ class ExtMap extends map {
       content: "image/webp",
       format: "rasted",
       encoding: "none",
+      apiKey: "",
     };
   }
 
   async getURL(z: number, x: number, y: number): Promise<string> {
     z--;
-    let url = `https://api.maptiler.com/tiles/hillshade/${z}/${x}/${y}.webp?key=gbetYLSD5vR8MdtZ88AQ`;
+    let url = `https://api.maptiler.com/tiles/hillshade/${z}/${x}/${y}.webp?key=${this._info.apiKey}`;
     return url;
   }
 }

@@ -8,10 +8,6 @@ import axios, { AxiosRequestConfig, Method, ResponseType } from "axios";
 import { SocksProxyAgent } from "socks-proxy-agent";
 let HttpsProxyAgent = require("https-proxy-agent");
 //------------------------------------------------------------------------------
-//Config
-//------------------------------------------------------------------------------
-import configMain from "../config/index";
-//------------------------------------------------------------------------------
 //ТОР
 //------------------------------------------------------------------------------
 import tor from "./tor";
@@ -23,7 +19,7 @@ import * as cheerio from "cheerio";
 //------------------------------------------------------------------------------
 //Net config from main config
 //------------------------------------------------------------------------------
-import config from "../config/index";
+import configMain from "../config/config";
 //------------------------------------------------------------------------------
 //Logging service
 //------------------------------------------------------------------------------
@@ -39,9 +35,9 @@ export default class httpEngine {
   private _response: string = "";
   private _byteLength: number = 0;
 
-  constructor(netConfig: iNetworkConfig | null) {
-    if (!netConfig) {
-      this._netConfig = config.network;
+  constructor(netConfig?: iNetworkConfig) {
+    if (typeof netConfig == "undefined") {
+      this._netConfig = configMain.network;
     } else {
       this._netConfig = netConfig;
     }
@@ -109,7 +105,7 @@ export default class httpEngine {
       //If need to use specific cookies for request
       if (cookies) {
         axiosConfig.withCredentials = true;
-        axiosConfig.headers.get = `Cookie: ${cookies}`;
+        axiosConfig.headers.common?.set("Cookie", cookies);
       }
       //If network state is enable
       if (netConfig.state != DownloadMode.disable || force == true) {
@@ -195,9 +191,9 @@ export default class httpEngine {
   }
 }
 
-export async function checkProxy(config = { ...configMain.network }) {
-  if (config.proxy.enable) {
-    let http = new httpEngine(config);
+export async function checkProxy(netConfig = { ...configMain.network }) {
+  if (netConfig.proxy.enable) {
+    let http = new httpEngine(netConfig);
     await http.get("https://2ip.ru/");
     let proxyReqIP = "";
     let nonProxyReqIP = "";
@@ -205,8 +201,8 @@ export async function checkProxy(config = { ...configMain.network }) {
       let $ = cheerio.load(http.response);
       proxyReqIP = $(".ip span").html() as string;
     }
-    config.proxy.enable = false;
-    http = new httpEngine(config);
+    netConfig.proxy.enable = false;
+    http = new httpEngine(netConfig);
     await http.get("https://2ip.ru/");
     if (http.code) {
       let $ = cheerio.load(http.response);

@@ -9,7 +9,7 @@ router.use(express.urlencoded({ extended: true }));
 //------------------------------------------------------------------------------
 //Config
 //------------------------------------------------------------------------------
-import config, { ExecFolder } from "../config/index";
+import config from "../config/index";
 //------------------------------------------------------------------------------
 //Logging service
 //------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ import { DownloadMode, LogModules } from "../src/enum";
 import { checkMapHandler, getMapHandler } from "../maps";
 import MapHandler from "../src/map";
 let url = require("url");
-import path from "path";
+const ExecFolder = process.cwd();
 import stat from "../src/statistics";
 //------------------------------------------------------------------------------
 //Tile request handler

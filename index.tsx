@@ -2,7 +2,8 @@
 //------------------------------------------------------------------------------
 //Config
 //------------------------------------------------------------------------------
-import config, { ExecFolder } from "./config/index";
+import config from "./config/index";
+const ExecFolder = process.cwd();
 //------------------------------------------------------------------------------
 //Express with socket IO
 //------------------------------------------------------------------------------
@@ -28,13 +29,13 @@ import { LogModules } from "./src/enum";
 //------------------------------------------------------------------------------
 //Static files for browser map
 //------------------------------------------------------------------------------
-app.use(express.static(path.join(ExecFolder, "..", "maptorium-maplibre")));
-app.post("/styles/bright.json", (req, res) => {
-  res.sendFile(path.join(ExecFolder, "styles", "bright.json"));
-});
-app.post("/styles/osm.json", (req, res) => {
-  res.sendFile(path.join(ExecFolder, "styles", "osm.json"));
-});
+const staticPath = path.join(ExecFolder, "..", "maptorium-maplibre");
+app.use(express.static(staticPath));
+//------------------------------------------------------------------------------
+//  Style POST Handler
+//------------------------------------------------------------------------------
+import style_router from "./routes/style";
+app.use("/styles", style_router);
 //------------------------------------------------------------------------------
 //  POI API Handler
 //------------------------------------------------------------------------------

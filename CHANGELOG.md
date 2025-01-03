@@ -1,5 +1,13 @@
 # maptorium-server Changelog
 
+## 3.1.0 (2024-11-10)
+
+### 🔧 Workflow
+
+- Adding support for USB/Serial GPS
+- GPS Core code optimization
+- Migrate from sqlite3 to better-sqlite3 module for better DB performance
+
 ## 3.0.0 (2024-05-13)
 
 ### 🔧 Bugs

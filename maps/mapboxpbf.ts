@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 import map from "../src/map";
 //------------------------------------------------------------------------------
-//Exstention to hande OSM maps
+//Exstention to hande MAPBOX Vector maps
 //------------------------------------------------------------------------------
 class ExtMap extends map {
   constructor() {
@@ -15,16 +15,19 @@ class ExtMap extends map {
       type: "layer",
       name: "MapBox Vector",
       submenu: "MapBOX",
-      tileSize: 256,
+      tileSize: 512,
       attribution: "",
       content: "application/x-protobuf",
       format: "vector",
-      encoding: "none",
+      encoding: "gzip",
+      apiKey: "",
     };
+    this._updateApiKey();
   }
 
   async getURL(z: number, x: number, y: number): Promise<string> {
-    let url = `https://api.maptiler.com/tiles/v3-openmaptiles/${z}/${x}/${y}.pbf?key=wbw4tKDjEjT5EOx2fCDq`;
+    //wbw4tKDjEjT5EOx2fCDq
+    let url = `https://api.maptiler.com/tiles/v3-openmaptiles/${z}/${x}/${y}.pbf?key=${this._info.apiKey}`;
     return url;
   }
 }
