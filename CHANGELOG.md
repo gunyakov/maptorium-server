@@ -1,5 +1,17 @@
 # maptorium-server Changelog
 
+## 3.2.0 (2025-02-05)
+
+### 🔧 Workflow
+
+- Adding GPS HTTP FOS Bridge 5.03 Support
+- Change GPS service flow function to ensure smoth GPS update
+- Update some dependency
+
+### 🔧 Bugs
+
+- GPS wrong sample time setting
+
 ## 3.1.0 (2024-11-10)
 
 ### 🔧 Workflow

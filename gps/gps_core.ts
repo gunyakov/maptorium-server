@@ -56,7 +56,6 @@ class GPS_CORE {
   //----------------------------------------------------------------------------
   public async start(): Promise<boolean> {
     this._enable = true;
-    Log.info(LogModules.gps, "GPS service started.");
     this.service();
     return true;
   }
@@ -65,7 +64,6 @@ class GPS_CORE {
   //----------------------------------------------------------------------------
   public async stop(): Promise<boolean> {
     this._enable = false;
-    Log.info(LogModules.gps, "GPS service stoped.");
     return true;
   }
   //----------------------------------------------------------------------------
@@ -73,8 +71,8 @@ class GPS_CORE {
   //----------------------------------------------------------------------------
   public async sampleRate(rate = 60): Promise<boolean> {
     if (typeof rate == "number") {
-      this._sampleRateTime = rate * 1000;
-      Log.info(LogModules.gps, `Sample rate changed to ${rate} seconds.`);
+      this._sampleRateTime = rate;
+      Log.info(LogModules.gps, `Sample rate changed to ${rate} ms.`);
       return true;
     } else {
       return false;
@@ -108,7 +106,12 @@ class GPS_CORE {
   //----------------------------------------------------------------------------
   //Function to get GPS from external source
   //----------------------------------------------------------------------------
-  public async getGPSCoords() {
+  public async getGPSCoords(): Promise<
+    { lat: number; lng: number; dir: number } | false
+  > {
+    return new Promise((resolve, rejects) => {
+      resolve(false);
+    });
     //You can import functions from httpJsonServer file and use there.
     //All other like timing beetwen request and so one will be handled in auto by this class.
   }
@@ -134,7 +137,6 @@ class GPS_CORE {
         this._dir = packet.trackTrue as number;
         this._update = true;
         //Send real time socket update
-        sendGPS(this._lat, this._lng, this._dir);
       }
     } catch (e) {
       if (e instanceof Error) {
@@ -166,18 +168,37 @@ class GPS_CORE {
   //----------------------------------------------------------------------------
   private async service(): Promise<void> {
     //Wait 10 seconds before start GPS service
-    await wait(10000);
+    await wait(1000);
     //Run cycle while service enabled
     let lastTime = 0;
+    Log.info(LogModules.gps, "GPS service started.");
     while (this._enable) {
-      //If it pass more than sample rate time set or its first start
-      if (lastTime == 0 || lastTime + this._sampleRateTime < Date.now()) {
-        //Get new GPS coords
-        await this.getGPSCoords();
-        //If class have proper coordinates received from source
-        if (this._lat && this._lng) {
-          //If coords is different from last update and record enabled
-          if (this._lastLng != this._lng || this._lastLat != this._lat) {
+      //Get new GPS coords
+      const newCoord = await this.getGPSCoords();
+      if (newCoord) {
+        this._lat = newCoord.lat;
+        this._lng = newCoord.lng;
+        this._dir = newCoord.dir;
+      }
+      //If class have proper coordinates received from source
+      if (this._lat && this._lng) {
+        //If coords is different from last update and record enabled
+        if (this._lastLng != this._lng || this._lastLat != this._lat) {
+          //Send GPS coords by socket.io to client
+          sendGPS(this._lat, this._lng, this._dir);
+          //Call callback, if registered
+          if (this._callback) {
+            this._callback({
+              lat: this._lat,
+              lng: this._lng,
+              dir: this._dir,
+            });
+          }
+          //Save current coords into class vars
+          this._lastLat = this._lat;
+          this._lastLng = this._lng;
+          //If it pass more than sample rate time set or its first start
+          if (lastTime == 0 || lastTime + this._sampleRateTime < Date.now()) {
             if (this._record) {
               //Add coords to database
               if (await POI.routeAddPoint(this._lat, this._lng))
@@ -188,21 +209,15 @@ class GPS_CORE {
                   "GPS data record failed due to BD error."
                 );
             }
-            //Save current coords into class vars
-            this._lastLat = this._lat;
-            this._lastLng = this._lng;
-            //Call callback, if registered
-            if (this._callback) {
-              this._callback({ lat: this._lat, lng: this._lng });
-            }
+            //Update last sample time to wait next record
+            lastTime = Date.now();
           }
         }
-        //Update last sample time to wait next event
-        lastTime = Date.now();
       }
       //Wait 1 second
       await wait(1000);
     }
+    Log.info(LogModules.gps, "GPS service stoped.");
   }
 }
 

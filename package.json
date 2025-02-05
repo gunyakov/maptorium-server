@@ -1,6 +1,6 @@
 {
   "name": "maptorium-server",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Maptorium http api server.",
   "bin": "index.js",
   "main": "index.tsx",
@@ -26,11 +26,11 @@
   },
   "homepage": "https://github.com/gunyakov/maptorium#readme",
   "dependencies": {
-    "@turf/turf": "^7.1.0",
-    "@turf/union": "^6.5.0",
+    "@turf/turf": "^7.2.0",
+    "@turf/union": "^7.2.0",
     "@types/sqlite3": "^3.1.11",
     "axios": "^1.7.7",
-    "better-sqlite3": "^11.5.0",
+    "better-sqlite3": "^11.8.1",
     "cheerio": "^1.0.0",
     "client-nmea-socket-to-event": "^1.1.6",
     "colors": "^1.4.0",
@@ -43,7 +43,7 @@
     "nmea-simple": "^3.3.0",
     "serialport": "^12.0.0",
     "sharp": "^0.33.5",
-    "socket.io": "^4.8.0",
+    "socket.io": "^4.8.1",
     "socketstream2event": "^1.1.0",
     "socks-proxy-agent": "^8.0.4",
     "sqlite3": "^5.1.7"

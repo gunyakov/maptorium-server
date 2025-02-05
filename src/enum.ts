@@ -69,4 +69,5 @@ export enum JobType {
 export enum GPSType {
   usb = "usb",
   tcp = "tcp",
+  httpFOS = "httpFOS",
 }

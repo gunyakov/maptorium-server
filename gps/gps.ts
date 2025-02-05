@@ -1,10 +1,11 @@
 import GPS_USB from "./gps_usb";
 import GPS_TCP from "./gps_tcp";
+import GPS_HTTP_FOS from "./gps_http_fos";
 import { GPSType } from "src/enum";
 import { GPSConfig } from "src/interface";
 
 class GPS {
-  private _gps: typeof GPS_USB | typeof GPS_TCP = GPS_TCP;
+  private _gps: typeof GPS_USB | typeof GPS_TCP | typeof GPS_HTTP_FOS = GPS_TCP;
   private _callback: CallableFunction = function () {};
   private _sampleRateTime: number = 60000;
 
@@ -17,8 +18,10 @@ class GPS {
   public async switch(type: GPSType) {
     if (type == GPSType.usb) {
       this._gps = GPS_USB;
-    } else {
+    } else if (type == GPSType.tcp) {
       this._gps = GPS_TCP;
+    } else if (type == GPSType.httpFOS) {
+      this._gps = GPS_HTTP_FOS;
     }
     //Reuse callback function
     if (this._callback) this._gps.on(this._callback);
@@ -30,15 +33,19 @@ class GPS {
     }
   }
 
-  public async config(config: GPSConfig, stopAndStar: boolean = false) {
+  public async config(config: GPSConfig, stopAndStart: boolean = false) {
     if (config.type == GPSType.usb) {
       if (this._gps != GPS_USB) this.switch(GPSType.usb);
       //@ts-ignore
-      this._gps.config(config.device, stopAndStar);
-    } else {
+      this._gps.config(config.device, stopAndStart);
+    } else if (config.type == GPSType.tcp) {
       if (this._gps != GPS_TCP) this.switch(GPSType.tcp);
       //@ts-ignore
-      this._gps.config(config.host, config.port, stopAndStar);
+      this._gps.config(config.host, config.port, stopAndStart);
+    } else if (config.type == GPSType.httpFOS) {
+      if (this._gps != GPS_HTTP_FOS) this.switch(GPSType.httpFOS);
+      //@ts-ignore
+      this._gps.config(config.host, config.port, stopAndStart);
     }
   }
 

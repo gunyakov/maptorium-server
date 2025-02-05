@@ -1,3 +1,4 @@
+process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
 import { UserConfig } from "../src/interface";
 
 import config from "./config";
