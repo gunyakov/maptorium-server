@@ -6,10 +6,9 @@ import Log from "src/log";
 //------------------------------------------------------------------------------
 //HTTP Engine
 //------------------------------------------------------------------------------
-import axios, { AxiosResponse } from "axios";
-import { response } from "express";
+import axios from "axios";
 import https from "https";
-import { LogModules } from "src/enum";
+import { LogModules } from "../src/enum";
 https.globalAgent.options.rejectUnauthorized = false;
 
 //------------------------------------------------------------------------------

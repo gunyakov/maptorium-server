@@ -17,6 +17,8 @@ import yandex from "./yandex";
 import yandexHyb from "./yandexHyb";
 import maptorium from "./maptorium";
 import sofiatraffic from "./sofiatraffic";
+import navionics from "./navionics";
+import garminmarine from "./garminmarine";
 
 let arrMaps: { [id: string]: MapHandler } = {};
 let arrMapsInfo: Array<MapInfo> = [];
@@ -46,6 +48,8 @@ initMap(maptorium);
 initMap(mapbox3d);
 initMap(mapboxterraine);
 initMap(sofiatraffic);
+initMap(navionics);
+initMap(garminmarine);
 
 export function getMapHandler(mapID: string): MapHandler {
   return arrMaps[mapID];

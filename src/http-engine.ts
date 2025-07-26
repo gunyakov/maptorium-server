@@ -34,13 +34,18 @@ export default class httpEngine {
   private _code: number = 0;
   private _response: string = "";
   private _byteLength: number = 0;
+  private _headers: AxiosRequestConfig["headers"] = {};
 
-  constructor(netConfig?: iNetworkConfig) {
+  constructor(
+    netConfig?: iNetworkConfig,
+    headers?: AxiosRequestConfig["headers"]
+  ) {
     if (typeof netConfig == "undefined") {
       this._netConfig = configMain.network;
     } else {
       this._netConfig = netConfig;
     }
+    if (headers) this._headers = headers;
   }
   public async get(
     url: string,
@@ -51,6 +56,7 @@ export default class httpEngine {
     cookies: string = ""
   ): Promise<boolean> {
     let thisClass = this;
+    thisClass._code = 0;
 
     let netConfig = this._netConfig;
 
@@ -66,7 +72,7 @@ export default class httpEngine {
         decompress: false,
         withCredentials: false,
         data: data,
-        headers: {},
+        headers: thisClass._headers,
       };
       if (netConfig.proxy.enable) {
         let proxyOptions = "";
@@ -97,11 +103,14 @@ export default class httpEngine {
           decompress: false,
           withCredentials: true,
           data: data,
-          headers: {},
+          headers: thisClass._headers,
         };
       }
       //Set user agent for request
-      axiosConfig.headers = { "User-Agent": netConfig.request.userAgent };
+      axiosConfig.headers = {
+        ...thisClass._headers,
+        "User-Agent": netConfig.request.userAgent,
+      };
       //If need to use specific cookies for request
       if (cookies) {
         axiosConfig.withCredentials = true;
@@ -124,6 +133,7 @@ export default class httpEngine {
             resolve(true);
           })
           .catch(async function (error) {
+            //console.log(error);
             //Show error message
             if (error.response) {
               thisClass._code = error.response.status;
@@ -134,8 +144,13 @@ export default class httpEngine {
                     LogModules.http,
                     error.response.status + " " + error.response.statusText
                   );
-                  thisClass._code = 404;
-                  resolve(true);
+                  // if (error.data) {
+                  //   thisClass._code = 200;
+                  //   resolve(error.data);
+                  // } else {
+                  resolve(false);
+                  // }
+
                   break;
                 case 403:
                   //If proxy type is TOR

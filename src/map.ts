@@ -34,6 +34,7 @@ class MapHandler {
     format: "rasted",
     encoding: "none",
     apiKey: "",
+    headers: {},
   };
 
   constructor() {}
@@ -59,7 +60,7 @@ class MapHandler {
     netConfig?: iNetworkConfig
   ) {
     let tileUrl = await this.getURL(z, x, y);
-    let http = new httpEngine(netConfig);
+    let http = new httpEngine(netConfig, this._info.headers);
     await http.get(tileUrl, "arraybuffer");
     return http;
   }

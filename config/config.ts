@@ -19,7 +19,7 @@ export default {
     state: DownloadMode.enable,
     request: {
       userAgent:
-        "Mozilla/5.0 (X11; Linux x86_64; rv:96.0) Gecko/20100101 Firefox/96.0",
+        "Mozilla/5.0 (X11; Linux x86_64; rv:134.0) Gecko/20100101 Firefox/134.0",
       timeout: 30000,
       delay: 3,
     },
