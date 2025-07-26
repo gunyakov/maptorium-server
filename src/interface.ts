@@ -1,4 +1,5 @@
-import sqlite3 from "sqlite3";
+import type { Database } from "better-sqlite3";
+
 import {
   DBState,
   DownloadMode,
@@ -19,8 +20,7 @@ export interface DBList {
   name: string;
   time: number;
   state: DBState;
-  db: sqlite3.Database;
-  statement: { [id: string]: sqlite3.Statement };
+  db: Database;
 }
 
 export interface Tile {

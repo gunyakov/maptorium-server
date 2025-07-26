@@ -17,7 +17,8 @@ import stat from "../src/statistics";
 //------------------------------------------------------------------------------
 //Config
 //------------------------------------------------------------------------------
-import config, {
+import {
+  config,
   saveDefConfig,
   setDefConfig,
   userConfig,

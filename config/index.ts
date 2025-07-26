@@ -1,18 +1,4 @@
-process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
-import { UserConfig } from "../src/interface";
-
-import config from "./config";
-
-export const ExecFolder = process.cwd();
-import path from "path";
-//Use CWD to run under linix or compile package with pkg for Windows
-
-//Use __dirname to run source under Windows
-//export const ExecFolder = path.join(__dirname, "..");
-const filePath = path.join(ExecFolder, "config.user.json");
-export var userConfig = require(filePath) as UserConfig;
-const configUpdated = { ...config, ...userConfig };
-export default configUpdated;
+//process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
 //------------------------------------------------------------------------------
 //NodeJS FS
 //------------------------------------------------------------------------------
@@ -22,34 +8,60 @@ import fs from "node:fs";
 //------------------------------------------------------------------------------
 import GPS from "../gps/gps";
 import { DownloadMode } from "../src/enum";
+import { UserConfig } from "../src/interface";
+import { isConfigReady, setConfigReady } from "./shared";
+import configDef from "./config";
 
-if (userConfig.gpsServer?.type) GPS.switch(userConfig.gpsServer.type);
+export const ExecFolder = process.cwd();
+import path from "path";
 
-if (!userConfig.recordRoute) {
-  GPS.stopRecord();
+let config = { ...configDef } as typeof configDef & UserConfig;
+let userConfig = {} as UserConfig;
+const filePath = path.join(ExecFolder, "config.user.json");
+
+//------------------------------------------------------------------------------
+//Prepare config
+//------------------------------------------------------------------------------
+async function prepareConfig() {
+  if (!isConfigReady()) {
+    userConfig = require(filePath);
+    config = { ...configDef, ...userConfig };
+    // GPS and config-dependent setup
+    if (userConfig.gpsServer?.type) GPS.switch(userConfig.gpsServer.type);
+
+    if (!userConfig.recordRoute) {
+      GPS.stopRecord();
+    }
+
+    if (userConfig.gpsSampleTime > 0) {
+      GPS.sampleRate(userConfig.gpsSampleTime);
+    }
+
+    if (userConfig.gpsServer) {
+      GPS.config(userConfig.gpsServer);
+    }
+
+    if (userConfig.gpsServiceRun) {
+      GPS.start();
+    }
+
+    if (userConfig.mode in DownloadMode) {
+      config.network.state = userConfig.mode;
+    }
+    setConfigReady(true);
+  }
 }
 
-if (userConfig.gpsSampleTime > 0) {
-  GPS.sampleRate(userConfig.gpsSampleTime);
+prepareConfig();
+
+function getDefConfig(key: keyof UserConfig & keyof typeof configDef): any {
+  console.log("Get config for key:", key);
+  console.log("Default config:", config);
+  console.log("User config:", userConfig);
+  return configDef[key] || userConfig[key];
 }
 
-if (userConfig.gpsServer) {
-  GPS.config(userConfig.gpsServer);
-}
-
-if (userConfig.gpsServiceRun) {
-  GPS.start();
-}
-
-if (userConfig.mode in DownloadMode) {
-  config.network.state = userConfig.mode;
-}
-
-export function getDefConfig(key: keyof UserConfig) {
-  return userConfig[key];
-}
-
-export async function setDefConfig(
+async function setDefConfig(
   key: keyof UserConfig,
   val: any,
   save: boolean = true
@@ -66,7 +78,7 @@ export async function setDefConfig(
   return true;
 }
 
-export async function saveDefConfig(): Promise<boolean> {
+async function saveDefConfig(): Promise<boolean> {
   return new Promise(function (resolve, reject) {
     fs.writeFile(filePath, JSON.stringify(userConfig), (err) => {
       if (err) {
@@ -77,3 +89,11 @@ export async function saveDefConfig(): Promise<boolean> {
     });
   });
 }
+export {
+  config,
+  userConfig,
+  getDefConfig,
+  setDefConfig,
+  saveDefConfig,
+  prepareConfig,
+};

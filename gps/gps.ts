@@ -1,8 +1,8 @@
 import GPS_USB from "./gps_usb";
 import GPS_TCP from "./gps_tcp";
 import GPS_HTTP_FOS from "./gps_http_fos";
-import { GPSType } from "src/enum";
-import { GPSConfig } from "src/interface";
+import { GPSType } from "../src/enum";
+import { GPSConfig } from "../src/interface";
 
 class GPS {
   private _gps: typeof GPS_USB | typeof GPS_TCP | typeof GPS_HTTP_FOS = GPS_TCP;

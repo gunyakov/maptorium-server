@@ -5,7 +5,8 @@ import queries from "./queries";
 //------------------------------------------------------------------------------
 //SQLITE3 driver
 //------------------------------------------------------------------------------
-import sqlite3 from "sqlite3";
+//import sqlite3 from "sqlite3";
+import Database from "better-sqlite3";
 //------------------------------------------------------------------------------
 //MD5 to store DB file name in list
 //------------------------------------------------------------------------------
@@ -23,7 +24,8 @@ import { DBList } from "../src/interface";
 //------------------------------------------------------------------------------
 //Config
 //------------------------------------------------------------------------------
-import config from "../config/index";
+import { isConfigReady } from "../config/shared";
+import { config } from "../config/index";
 //------------------------------------------------------------------------------
 //Array to store all opened SQLITE DB descriptors
 //------------------------------------------------------------------------------
@@ -44,26 +46,23 @@ class SQLite3Promise {
         name: dbName,
         time: Math.floor(Date.now() / 1000),
         state: DBState.inprogress,
-        db: new sqlite3.Database(""),
-        statement: {}
+        db: new Database(dbName),
       };
     }
     if (arrDBSQLITE3[dbNameHash].state != DBState.open) {
       return new Promise(function (resolve, reject) {
-        arrDBSQLITE3[dbNameHash].db = new sqlite3.Database(dbName, function (
-          err
-        ) {
-          if (err) {
-            Log.error(LogModules.sqlite3, err.message);
-            Log.error(LogModules.sqlite3, dbName);
-            resolve(false);
-          } else {
-            Log.info(LogModules.sqlite3, "OPEN -> " + dbName);
-            arrDBSQLITE3[dbNameHash].state = DBState.open;
-            arrDBSQLITE3[dbNameHash].time = Math.floor(Date.now() / 1000);
-            resolve(true);
-          }
-        });
+        try {
+          arrDBSQLITE3[dbNameHash].db = new Database(dbName);
+          arrDBSQLITE3[dbNameHash].db.pragma("journal_mode = WAL");
+          arrDBSQLITE3[dbNameHash].state = DBState.open;
+          arrDBSQLITE3[dbNameHash].time = Math.floor(Date.now() / 1000);
+          Log.info(LogModules.sqlite3, "OPEN -> " + dbName);
+          resolve(true);
+        } catch (e) {
+          Log.error(LogModules.sqlite3, (e as Error)?.message);
+          Log.error(LogModules.sqlite3, dbName);
+          resolve(false);
+        }
       });
     } else {
       return new Promise(function (resolve, reject) {
@@ -73,101 +72,88 @@ class SQLite3Promise {
     }
   }
 
-  async serialize(dbName: string) {
-    let dbNameHash = md5(dbName) as string;
-    await this.open(dbName);
-    return new Promise(function (resolve, reject) {
-      arrDBSQLITE3[dbNameHash].db.serialize(function () {
-        Log.success(LogModules.sqlite3, "SERIALIZE -> " + dbName);
-        resolve(true);
-      });
-    });
-  }
-
   // any query: insert/delete/update
   async run(
     dbName: string,
     key: string,
     params: Array<any> = []
   ): Promise<boolean | number> {
-    //Get QUERY or USE key as query
-    let sql = queries[key] ? queries[key] : key;
-    //Prepare DB key from name
-    let dbNameHash = md5(dbName) as string;
-    //Create/open DB if not created or opened
-    await this.open(dbName);
-    //Create query statement key
-    let strStatement = md5(key) as string;
-    //If not prepared statement for DB
-    if(!arrDBSQLITE3[dbNameHash].statement[strStatement]) {
-      //Create statement
-      arrDBSQLITE3[dbNameHash].statement[strStatement] = arrDBSQLITE3[dbNameHash].db.prepare(sql);
-    }
-    //Save statement in var for fast access
-    let statement = arrDBSQLITE3[dbNameHash].statement[strStatement];
-    //Promise
-    return new Promise(function (resolve, reject) {
-      //Run statement with params 
-      statement.run(
-        params,
-        function (err: string, result: any) {
-          if (err) {
-            Log.error(LogModules.sqlite3, err + " " + dbName);
-            resolve(false);
-          } else {
-            Log.success(LogModules.sqlite3, "RUN -> " + dbName);
-            //@ts-ignore
-            this?.lastID > 0 ? resolve(this.lastID) : resolve(true);
-          }
+    const stmt = await this.prepare(dbName, key);
+
+    if (stmt) {
+      return new Promise(function (resolve, reject) {
+        try {
+          const info = stmt.run(params);
+          Log.success(LogModules.sqlite3, "RUN -> " + dbName);
+          resolve(info.lastInsertRowid);
+        } catch (e) {
+          Log.error(LogModules.sqlite3, (e as Error)?.message + " " + dbName);
+          resolve(false);
         }
+      });
+    } else {
+      Log.error(
+        LogModules.sqlite3,
+        "Statement preparation failed for " + dbName
       );
-    });
+      return false;
+    }
   }
 
   // first row read
   async get(dbName: string, key: string, params: Array<any> = []) {
-    let dbNameHash = md5(dbName) as string;
-    await this.open(dbName);
-    return new Promise(function (resolve, reject) {
-      let sql = queries[key] || key;
-      arrDBSQLITE3[dbNameHash].db.get(sql, params, function (err, row) {
-        if (err) {
-          Log.error(LogModules.sqlite3, err.message + " " + dbName);
-          resolve(false);
-        } else {
+    const stmt = await this.prepare(dbName, key);
+    if (stmt) {
+      return new Promise(function (resolve, reject) {
+        try {
+          const row = stmt.get(params);
           Log.success(LogModules.sqlite3, "GET -> " + dbName);
-          resolve(row);
+          if (typeof row == "undefined") resolve(false);
+          else resolve(row);
+        } catch (e) {
+          Log.error(LogModules.sqlite3, (e as Error)?.message + " " + dbName);
+          resolve(false);
         }
       });
-    });
+    } else {
+      return false;
+    }
   }
 
   // set of rows read
   async all(dbName: string, key: string, params: Array<any> = []) {
-    let dbNameHash = md5(dbName) as string;
-    await this.open(dbName);
-    let sql = queries[key] ? queries[key] : key;
-    return new Promise(function (resolve, reject) {
-      arrDBSQLITE3[dbNameHash].db.all(sql, params, function (err, rows) {
-        if (err) {
-          Log.error(LogModules.sqlite3, err.message + " " + dbName);
+    const stmt = await this.prepare(dbName, key);
+    if (stmt) {
+      return new Promise(function (resolve, reject) {
+        try {
+          const rows = stmt.all(params);
+          if (rows.length == 0) {
+            resolve(false);
+          } else {
+            Log.success(LogModules.sqlite3, "ALL -> " + dbName);
+            resolve(rows);
+          }
+        } catch (e) {
+          Log.error(LogModules.sqlite3, (e as Error)?.message + " " + dbName);
           resolve(false);
-        } else {
-          Log.success(LogModules.sqlite3, "ALL -> " + dbName);
-          resolve(rows);
         }
       });
-    });
+    } else {
+      return false;
+    }
   }
 
   //prepare sql for bulk requests
-  async prepare (dbName: string, key: string):Promise<sqlite3.Statement> {
-    let dbNameHash = md5(dbName) as string;
-    await this.open(dbName);
-    let sql = queries[key] ? queries[key] : key;
-    return new Promise(function (resolve, reject) {
-      resolve(arrDBSQLITE3[dbNameHash].db.prepare(sql));
-    });
+  async prepare(dbName: string, key: string): Promise<any> {
+    if (await this.open(dbName)) {
+      return new Promise(function (resolve, reject) {
+        let dbNameHash = md5(dbName) as string;
+        let sql = queries[key] ? queries[key] : key;
+        resolve(arrDBSQLITE3[dbNameHash].db.prepare(sql));
+      });
+    } else {
+      return false;
+    }
   }
   // each row returned one by one
   async each(
@@ -176,46 +162,37 @@ class SQLite3Promise {
     params: Array<any>,
     action: CallableFunction
   ) {
-    let dbNameHash = md5(dbName) as string;
-    await this.open(dbName);
-    return new Promise(function (resolve, reject) {
-      if (params == undefined) params = [];
-      var db = arrDBSQLITE3[dbNameHash].db;
-      db.serialize(function () {
-        let sql = queries[key] ? queries[key] : key;
-        db.each(sql, params, function (err, row) {
-          if (err) reject("Read error: " + err.message);
-          else {
-            if (row) {
-              action(row);
-            }
-          }
-        });
-        db.get("", function (err, row) {
-          resolve(true);
-        });
+    const stmt = await this.prepare(dbName, key);
+    if (stmt) {
+      return new Promise(function (resolve, reject) {
+        const resultArr = [];
+        if (params == undefined) params = [];
+        for (const row of stmt.iterate(params)) {
+          resultArr.push(action(row));
+        }
+        if (resultArr.length == 0) resolve(false);
+        else resolve(resultArr);
       });
-    });
+    }
   }
 
   async close(dbName: string) {
     let dbNameHash = md5(dbName) as string;
-    await this.open(dbName);
     return new Promise(function (resolve, reject) {
-      arrDBSQLITE3[dbNameHash].db.close(function (err) {
+      try {
+        arrDBSQLITE3[dbNameHash].db.close();
         arrDBSQLITE3[dbNameHash].state = DBState.closed;
-        if (err) {
-          Log.error(LogModules.sqlite3, err.message + " " + dbName);
-          resolve(false);
-        } else {
-          Log.info(LogModules.sqlite3, "CLOSE -> " + dbName);
-          resolve(true);
-        }
-      });
+        Log.info(LogModules.sqlite3, "CLOSE -> " + dbName);
+        resolve(true);
+      } catch (e) {
+        Log.error(LogModules.sqlite3, (e as Error)?.message + " " + dbName);
+        resolve(false);
+      }
     });
   }
 
   async service() {
+    while (!isConfigReady()) await wait(1000);
     //Run neverended cycle
     while (true) {
       //Go throught DB list
@@ -227,18 +204,10 @@ class SQLite3Promise {
           dbTimeOpen > config.db.OpenTime &&
           arrDBSQLITE3[key].state == DBState.open
         ) {
-          //Finalaize all statements for DB before close
-          Object.values(arrDBSQLITE3[key].statement).forEach(value => {
-            value.finalize((err) => {
-              if(err) Log.error(LogModules.sqlite3, err.message);
-            });
-          });
           //Close DB
           await this.close(value.name);
           //Set DB close state
           arrDBSQLITE3[key].state = DBState.closed;
-          //Reset all sql statements
-          arrDBSQLITE3[key].statement = {};
         }
       }
       //Run function each 5 seconds

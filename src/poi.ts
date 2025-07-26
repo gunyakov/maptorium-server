@@ -10,9 +10,8 @@ import sqlite3 from "../DB/sqlite3-promise";
 //Other imports
 //------------------------------------------------------------------------------
 import { GPSCoords, POIInfo, POICategory, ROUTE, MarkInfo } from "./interface";
-import { LogModules } from "./enum";
+import { LogModules, POIType } from "./enum";
 import { sendRoutePoint } from "./io";
-import { POIType } from "./enum";
 //------------------------------------------------------------------------------
 //NodeJS core file system functions
 //------------------------------------------------------------------------------
@@ -44,7 +43,7 @@ class POIHandler {
         Log.error(LogModules.poi, "Cant make POI DB. Pls check location.");
       }
     }
-    this.routeGetID();
+    //this.routeGetID();
   }
   //------------------------------------------------------------------------------
   //Check if POI present in DB
