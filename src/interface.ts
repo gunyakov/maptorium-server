@@ -10,7 +10,7 @@ import {
   JobType,
   GPSType,
 } from "./enum";
-import { AxiosHeaders } from "axios";
+import type { AxiosRequestHeaders } from "axios";
 
 export type LogArray = {
   [id in LogType]: Array<string>;
@@ -84,7 +84,7 @@ export interface MapInfo {
   format: string;
   encoding: "gzip" | "none";
   apiKey?: string;
-  headers?: AxiosHeaders | {};
+  headers?: AxiosRequestHeaders;
 }
 
 export interface iNetworkConfig {

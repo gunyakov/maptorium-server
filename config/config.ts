@@ -55,8 +55,10 @@ export default {
     emptyTiles: true,
     //Check from server tiles what was marked like empty id DB
     checkEmptyTiles: false,
-    //Udpate tiles what marked empty and if some time pass from last check
+    //Update tiles what marked empty and if some time pass from last check
     updateDateEmpty: false,
+    //Mode to download tiles not by list, but by random
+    randomDownload: false,
   },
   //----------------------------------------------------------------------------
   //Log service

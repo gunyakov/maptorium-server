@@ -64,12 +64,12 @@ class JobManager {
   constructor() {}
 
   //public async add(jobConfig:iJobConfig | GenJobInfo, generate:boolean = false) {
-  public async add(jobConfig: iJobConfig, generate: boolean = false) {
+  public async add(jobConfig: iJobConfig) {
     //Push job order to list
     let ID = crypto.randomBytes(16).toString("hex");
     let jobInfo: JobsList = {
       ID: ID,
-      type: generate ? JobType.generate : JobType.download,
+      type: JobType.download,
       mapID: jobConfig.download.mapID,
       running: false,
     };
@@ -101,6 +101,41 @@ class JobManager {
       sendJobStart(ID);
     }
 
+    return true;
+  }
+
+  public async addGen(jobConfig: GenJobInfo): Promise<boolean> {
+    //Push job order to list
+    let ID = crypto.randomBytes(16).toString("hex");
+    let jobInfo: JobsList = {
+      ID: ID,
+      type: JobType.generate,
+      mapID: jobConfig.mapID,
+      running: false,
+    };
+    this._arrJobsList.push(jobInfo);
+    jobConfig.ID = ID;
+    //Make generator for job
+    let handler = new Generator(jobConfig);
+    //Reg callback to notify that job was finished
+    handler.onEnd(async (ID: string) => {
+      sendJobEnd(ID);
+      //Delete job from array
+      await this.delete(ID);
+      //Start another job if present in list
+      if (this._jobsRunning == 0 && this._arrJobsList.length > 0) {
+        this.start(this._arrJobsList[0].ID);
+        sendJobStart(this._arrJobsList[0].ID);
+      }
+    });
+    //Callback when tile was geted from net with 200 or 404 state for cached map redrawing in UI
+    handler.onTile(this.emitTileUpdate.bind(this));
+    this._handlers[ID] = handler;
+    //If this is first job added to queue, start download
+    if (this._jobsRunning == 0) {
+      this.start(ID);
+      sendJobStart(ID);
+    }
     return true;
   }
 

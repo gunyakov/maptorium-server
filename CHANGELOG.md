@@ -1,5 +1,11 @@
 # maptorium-server Changelog
 
+## 3.2.2 (2025-07-28)
+
+### 🔧 Bugs
+
+- Recover bug during adding download job
+
 ## 3.2.0 (2025-02-05)
 
 ### 🔧 Workflow

@@ -15,6 +15,7 @@ import POI from "../src/poi";
 //------------------------------------------------------------------------------
 import { GenJobInfo, iJobConfig } from "../src/interface";
 import { checkMapHandler } from "../maps";
+import defConfig from "../config/config";
 //------------------------------------------------------------------------------
 //HTTP Server: Request to get jobs list
 //------------------------------------------------------------------------------
@@ -32,6 +33,7 @@ router.get("/list", async function (req, res) {
 router.post("/download", async function (req, res) {
   function checkType<T>(data: T, interfaceObj: any): true | string {
     for (const key in interfaceObj) {
+      if (key === "network" && data["customNetworkConfig"] === false) continue;
       if (typeof interfaceObj[key] === "object") {
         if (!checkType(data[key], interfaceObj[key])) {
           return key;
@@ -40,7 +42,24 @@ router.post("/download", async function (req, res) {
     }
     return true;
   }
-  const result = checkType(req.body, iJobConfig);
+  //Default job settings
+  let JobConfig: iJobConfig = {
+    polygonID: 0,
+    download: {
+      ...defConfig.downloader,
+      ID: "0",
+      mapID: "none",
+      dateTiles: "",
+      dateEmpty: "",
+      zoom: {},
+      threadsCounter: defConfig.service.threads,
+    },
+    customNetworkConfig: false,
+    network: defConfig.network,
+  };
+  //console.log(req.body, JobConfig);
+  //Check that request body has all keys from interface
+  const result = checkType(req.body, JobConfig);
   if (result === true) {
     if (!checkMapHandler(req.body?.download?.mapID)) {
       res.json({
@@ -191,7 +210,7 @@ router.post("/generate", async function (req, res) {
       return;
     }
   }
-  JobManager.add(jobConfig, true);
+  JobManager.addGen(jobConfig);
   res.json({ result: "success", message: "Job added to queue." });
 });
 
