@@ -35,13 +35,13 @@ router.get("/now", async function (req, res) {
 
 router.get("/route/:routeID", async function (req, res) {
   let routeData = (await POI.routeGetHistory(
-    parseInt(req.params.routeID)
+    parseInt(req.params.routeID),
   )) as Array<GPSCoords>;
 
   if (routeData) {
     res.json({ result: "success", data: routeData });
   } else {
-    res.json({ result: "error", message: "Cant find route data in DB." });
+    res.json({ result: "error", message: "txt.gps.error.route_not_found" });
   }
 });
 
@@ -52,7 +52,7 @@ router.get("/point", async function (req, res) {
   } else {
     res.json({
       result: "success",
-      message: "Cant get last route point. Result is empty now.",
+      message: "txt.gps.error.no_last_point",
     });
   }
 });
@@ -60,11 +60,11 @@ router.get("/point", async function (req, res) {
 router.get("/stoprecord", async function (req, res) {
   if (await GPS.stopRecord()) {
     setDefConfig("recordRoute", false);
-    res.json({ result: "success", message: "GPS disable record to DB." });
+    res.json({ result: "success", message: "txt.gps.disable_recording" });
   } else {
     res.json({
       result: "error",
-      message: "Error to disable GPS record to DB.",
+      message: "txt.gps.error.disable_recording",
     });
   }
 });
@@ -72,20 +72,21 @@ router.get("/stoprecord", async function (req, res) {
 router.get("/startrecord", async function (req, res) {
   if (await GPS.startRecord()) {
     setDefConfig("recordRoute", true);
-    res.json({ result: "success", message: "GPS enable record to DB." });
+    res.json({ result: "success", message: "txt.gps.enable_recording" });
   } else {
-    res.json({ result: "error", message: "Error to enable GPS record to DB." });
+    res.json({ result: "error", message: "txt.gps.error.enable_recording" });
   }
 });
 
 router.post("/routenew", async function (req, res) {
   if (req.body.name?.length > 4) {
     if (await POI.routeAddRoute(req.body.name)) {
-      res.json({ result: "success", message: "New route started." });
+      res.json({ result: "success", message: "txt.gps.new_route_started" });
     } else {
-      res.json({ result: "error", message: "Error to start new route." });
+      res.json({ result: "error", message: "txt.gps.error.new_route" });
     }
-  } else res.json({ result: "error", message: "Route name is empty or less than 4 simbols." });
+  } else
+    res.json({ result: "error", message: "txt.gps.error.invalid_route_name" });
 });
 
 router.get("/routelist", async function (req, res) {
@@ -93,7 +94,7 @@ router.get("/routelist", async function (req, res) {
   if (list) {
     res.json({ result: "success", data: list });
   } else {
-    res.json({ result: "error", message: "Routes list is empty." });
+    res.json({ result: "error", message: "txt.gps.error.empty_route_list" });
   }
 });
 
@@ -103,31 +104,35 @@ router.post("/sample", async function (req, res) {
   if (time) {
     if (await GPS.sampleRate(time)) {
       setDefConfig("gpsSampleTime", time);
-      res.json({ result: "info", message: "GPS: Sample rate changed." });
+      res.json({ result: "info", message: "txt.gps.sample_time_updated" });
     } else {
       res.json({
         result: "error",
-        message: "GPS: Sample rate changing error.",
+        message: "txt.gps.error.sample_time_update",
       });
     }
-  } else res.json({ result: "warning", message: "Cant read time value. Skip." });
+  } else
+    res.json({
+      result: "warning",
+      message: "txt.gps.error.invalid_sample_time",
+    });
 });
 
 router.get("/start", async function (req, res) {
   if (await GPS.start()) {
     setDefConfig("gpsServiceRun", true);
-    res.json({ result: "success", message: "GPS Service started." });
+    res.json({ result: "success", message: "txt.gps.started" });
   } else {
-    res.json({ result: "error", message: "Error to start GPS Service," });
+    res.json({ result: "error", message: "txt.gps.error.start" });
   }
 });
 
 router.get("/stop", async function (req, res) {
   if (await GPS.stop()) {
     setDefConfig("gpsServiceRun", false);
-    res.json({ result: "success", message: "GPS Service stoped." });
+    res.json({ result: "success", message: "txt.gps.stopped" });
   } else {
-    res.json({ result: "error", message: "Error to stop GPS Service," });
+    res.json({ result: "error", message: "txt.gps.error.stop" });
   }
 });
 /**

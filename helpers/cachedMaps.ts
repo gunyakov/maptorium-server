@@ -22,7 +22,7 @@ let timeLastUpdate: number = 0;
 export async function getCachedMap(
   mapID: string,
   zoom: number,
-  arrTiles: Array<TileInfo>
+  arrTiles: Array<TileInfo>,
 ) {
   makeTileChecking = true;
   runTileChecking = true;
@@ -43,13 +43,15 @@ export async function getCachedMap(
       if (timeLastUpdate + 200 < Date.now()) {
         sendCachedMapUpdate({ tiles: i, total: arrTiles.length });
         timeLastUpdate = Date.now();
+        //console.log("Update tile info");
+        await wait(50);
       }
       if (makeTileChecking) {
         let [tileInDB, tileInfo] = await mapHandler.checkTile(
           arrTiles[i].z as number,
           arrTiles[i].x,
           arrTiles[i].y,
-          false
+          false,
         );
         let state = TileInCache.missing;
         if (tileInDB) {
@@ -72,7 +74,7 @@ export async function getCachedMap(
       time = Math.round((Date.now() - time) / 1000);
       Log.success(
         LogModules.main,
-        `Finished checking tiles in DB for cached map. Time spend ${time}.`
+        `Finished checking tiles in DB for cached map. Time spend ${time}.`,
       );
       time = Date.now();
       //tileCachedMap = await CachedMap.generateMap(cachedMap);
@@ -85,6 +87,18 @@ export async function getCachedMap(
     Log.info(LogModules.main, `Cant get map handler by ID: ${mapID}. Skip.`);
   }
   runTileChecking = false;
+}
+
+export async function getCachedMapByPolygon(
+  polygon: Array<GPSCoords>,
+  zoom: number,
+  map: string,
+  tileSize: number,
+) {
+  let tileList = await tileListByPolygon(polygon, zoom, tileSize);
+  if (tileList.length > 0) {
+    getCachedMap(map, zoom, tileList);
+  }
 }
 //------------------------------------------------------------------------------
 //Stop tile checking function and wait intil function is finishing execution
@@ -103,7 +117,7 @@ export async function getCachedMapByPOI(
   poiID: number,
   zoom: number,
   map: string,
-  tileSize:number
+  tileSize: number,
 ) {
   let tileList = await tilesListByPOI(poiID, zoom, tileSize);
   if (tileList.length > 0) {
@@ -115,7 +129,7 @@ export async function getCachedMapByBBOX(
   bbox: Array<number>,
   zoom: number,
   map: string,
-  tileSize:number
+  tileSize: number,
 ) {
   let points: Array<GPSCoords> = [];
   points.push({ lat: bbox[1], lng: bbox[0] });

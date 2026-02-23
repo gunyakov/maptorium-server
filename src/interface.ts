@@ -85,6 +85,7 @@ export interface MapInfo {
   encoding: "gzip" | "none";
   apiKey?: string;
   headers?: AxiosRequestHeaders;
+  storagePath?: string;
 }
 
 export interface iNetworkConfig {
@@ -131,6 +132,7 @@ export interface iJobInfo {
 }
 export interface iJobConfig {
   polygonID: number;
+  polygon: Array<GPSCoords>;
   customNetworkConfig: boolean;
   network?: iNetworkConfig;
   download: iJobInfo;
@@ -157,7 +159,8 @@ export interface JobStat {
 export interface GenJobInfo {
   ID: string;
   mapID: string;
-  polygonID: string;
+  polygonID: number;
+  polygon: Array<GPSCoords>;
   zoom: Array<string>;
   updateTiles: boolean;
   completeTiles: boolean;
@@ -188,6 +191,7 @@ export interface UserConfig {
   gpsServiceRun?: boolean;
   gpsServer?: GPSConfig;
   apiKeys?: { [id: string]: string };
+  mapStoragePaths?: { [id: string]: string };
 }
 
 export interface CachedTilesList {

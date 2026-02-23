@@ -24,19 +24,24 @@ import tile_router from "./routes/tile";
 import gps_router from "./routes/gps";
 import core_router from "./routes/core";
 import map_router from "./routes/map";
+import fs_router from "./routes/fs";
+import { applyMapStoragePaths } from "./maps";
 //------------------------------------------------------------------------------
 (async () => {
   //----------------------------------------------------------------------------
   //Prepare config
   //----------------------------------------------------------------------------
   while (!isConfigReady()) await wait(1000);
+  await applyMapStoragePaths();
   //----------------------------------------------------------------------------
   const ExecFolder = process.cwd();
   //----------------------------------------------------------------------------
   //Express with socket IO
   //----------------------------------------------------------------------------
   let express = require("express");
+  let cors = require("cors");
   const app = express();
+  app.use(cors());
   const server = require("http").createServer(app);
   const path = require("path");
   //----------------------------------------------------------------------------
@@ -51,7 +56,7 @@ import map_router from "./routes/map";
   //----------------------------------------------------------------------------
   //Static files for browser map
   //----------------------------------------------------------------------------
-  const staticPath = path.join(ExecFolder, "..", "maptorium-maplibre");
+  const staticPath = path.join(ExecFolder, "public_html");
   app.use(express.static(staticPath));
   //----------------------------------------------------------------------------
   //  Style POST Handler
@@ -80,6 +85,11 @@ import map_router from "./routes/map";
   //----------------------------------------------------------------------------
   //  MAP API Handler
   app.use("/map", map_router);
+  //----------------------------------------------------------------------------
+  //  Filesystem API Handler
+  //----------------------------------------------------------------------------
+  app.use("/fs", fs_router);
+  app.use("/filesystem", fs_router);
   //----------------------------------------------------------------------------
   //Open port for incoming requests
   //----------------------------------------------------------------------------

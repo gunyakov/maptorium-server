@@ -1,5 +1,6 @@
 import MapHandler from "../src/map";
 import { MapInfo } from "../src/interface";
+import { setDefConfig, userConfig } from "../config/index";
 
 import arcgis_elevation from "./arcgis_elevation";
 import arcgis_sat from "./arcgis_sat";
@@ -16,7 +17,6 @@ import osm from "./osm";
 import yandex from "./yandex";
 import yandexHyb from "./yandexHyb";
 import maptorium from "./maptorium";
-import sofiatraffic from "./sofiatraffic";
 import navionics from "./navionics";
 import garminmarine from "./garminmarine";
 
@@ -47,7 +47,6 @@ initMap(yandexHyb);
 initMap(maptorium);
 initMap(mapbox3d);
 initMap(mapboxterraine);
-initMap(sofiatraffic);
 initMap(navionics);
 initMap(garminmarine);
 
@@ -58,6 +57,39 @@ export function getMapHandler(mapID: string): MapHandler {
 export function checkMapHandler(mapID: string): boolean {
   if (arrMaps[mapID]) return true;
   else return false;
+}
+
+export function getMapsInfo(): Array<MapInfo> {
+  return Object.values(arrMaps).map((mapHandler) => mapHandler.getInfo());
+}
+
+export async function setMapStoragePath(
+  mapID: string,
+  storagePath: string,
+  save: boolean = true,
+): Promise<boolean> {
+  if (!arrMaps[mapID]) return false;
+  const isUpdated = arrMaps[mapID].setpath(storagePath);
+  if (!isUpdated) return false;
+
+  if (!save) return true;
+
+  const mapStoragePaths = {
+    ...(userConfig.mapStoragePaths || {}),
+    [mapID]: arrMaps[mapID].getPath(),
+  };
+  return await setDefConfig("mapStoragePaths", mapStoragePaths, true);
+}
+
+export async function applyMapStoragePaths(): Promise<void> {
+  const mapStoragePaths = userConfig.mapStoragePaths || {};
+  const mapIDs = Object.keys(mapStoragePaths);
+
+  for (let i = 0; i < mapIDs.length; i++) {
+    const mapID = mapIDs[i];
+    if (!arrMaps[mapID]) continue;
+    await setMapStoragePath(mapID, mapStoragePaths[mapID], false);
+  }
 }
 
 export { arrMaps, arrMapsInfo };

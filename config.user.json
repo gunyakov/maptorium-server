@@ -1,1 +1,31 @@
-{"map":"googlesat","layers":["mapbox"],"lat":42.52431694282217,"lng":33.3974938817895,"zoom":4,"showRoute":true,"recordRoute":true,"gpsSampleTime":60,"mode":"enable","jobManager":true,"GPSInfoPanel":false,"distanceToGo":10000,"gpsServiceRun":false,"style":"bright","poiManager":false,"units":"nmile","gpsServer":{"type":"httpFOS","host":"192.168.83.100","port":8921,"device":"COM7"},"apiKeys":{"maptorium":"AFDB00AEECFF144D2934D6C5FD849F39","mapbox":"Te86e6irxQ673m7olJqV"}}
+{
+  "map": "googlesat",
+  "layers": ["mapbox"],
+  "lat": 37.65292008443612,
+  "lng": 22.14749388180553,
+  "zoom": 4,
+  "showRoute": true,
+  "recordRoute": true,
+  "gpsSampleTime": 60,
+  "mode": "enable",
+  "jobManager": true,
+  "GPSInfoPanel": true,
+  "distanceToGo": 10000,
+  "gpsServiceRun": true,
+  "style": "bright",
+  "poiManager": false,
+  "units": "nmile",
+  "gpsServer": {
+    "type": "httpFOS",
+    "host": "127.0.0.1",
+    "port": 9010,
+    "device": "/dev/ttyS0"
+  },
+  "apiKeys": {
+    "maptorium": "AFDB00AEECFF144D2934D6C5FD849F39",
+    "mapbox": "Te86e6irxQ673m7olJqV"
+  },
+  "mapStoragePaths": {
+    "googlesat": "/media/oleg/01DA418936B8B2D0/storage/google"
+  }
+}

@@ -13,7 +13,7 @@ import { getMapHandler } from "../maps/index";
 //------------------------------------------------------------------------------
 let moment = require("moment");
 
-import { tilesListByPOI } from "../helpers/tilesList";
+import { tileListByPolygon } from "../helpers/tilesList";
 //------------------------------------------------------------------------------
 //Config
 //------------------------------------------------------------------------------
@@ -84,10 +84,10 @@ class Downloader {
       for (const zoom in this._jobConfig.download.zoom) {
         if (this._jobConfig.download.zoom[zoom] === true) {
           //Create tile list for zoom level
-          let tempArr = await tilesListByPOI(
-            this._jobConfig.polygonID,
+          let tempArr = await tileListByPolygon(
+            this._jobConfig.polygon,
             parseInt(zoom),
-            this._mapHandler.getInfo().tileSize
+            this._mapHandler.getInfo().tileSize,
           );
           //If create tile list for current zoom
           if (Array.isArray(tempArr)) {
@@ -114,7 +114,7 @@ class Downloader {
   async stop() {
     Log.success(
       LogModules.worker,
-      `Job stoped for Polygon ${this._jobConfig.polygonID} and Map ${this._jobConfig.download.mapID}. Tile Count: ${this._tilesList.length}`
+      `Job stoped for Polygon ${this._jobConfig.polygonID} and Map ${this._jobConfig.download.mapID}. Tile Count: ${this._tilesList.length}`,
     );
     //Set running flag
     this._running = false;
@@ -139,7 +139,7 @@ class Downloader {
   async threadsStarter(): Promise<void> {
     Log.success(
       LogModules.worker,
-      `Job started for Polygon ${this._jobConfig.polygonID} and Map ${this._jobConfig.download.mapID}. Tile Count: ${this._tilesList.length}`
+      `Job started for Polygon ${this._jobConfig.polygonID} and Map ${this._jobConfig.download.mapID}. Tile Count: ${this._tilesList.length}`,
     );
     //Reset thread counter
     let threadCounter =
@@ -193,7 +193,7 @@ class Downloader {
           //Get random tile
           [jobTile] = this._tilesList.splice(
             Math.floor(Math.random() * this._tilesList.length),
-            1
+            1,
           );
         }
         //If download in normal mode
@@ -208,7 +208,7 @@ class Downloader {
           jobTile.z,
           jobTile.x,
           jobTile.y,
-          false
+          false,
         );
 
         //If tile missing in DB, set that download required for tile
@@ -224,7 +224,7 @@ class Downloader {
             } else {
               //Parse date to unix time
               let tileEmptyDate = moment(
-                this._jobConfig.download.dateTiles
+                this._jobConfig.download.dateTiles,
               ).unix();
               //If tile was downloaded before date
               if (tileInfo.d < tileEmptyDate) {
@@ -243,7 +243,7 @@ class Downloader {
             else {
               //Parse date to unix time
               let tileEmptyDate = moment(
-                this._jobConfig.download.dateEmpty
+                this._jobConfig.download.dateEmpty,
               ).unix();
               //If tile was downloaded before date
               if (tileInfo.d < tileEmptyDate) {
@@ -268,7 +268,7 @@ class Downloader {
               jobTile.z,
               jobTile.x,
               jobTile.y,
-              this._netConfig
+              this._netConfig,
             );
           }
           //Update tile
@@ -277,7 +277,7 @@ class Downloader {
               jobTile.z,
               jobTile.x,
               jobTile.y,
-              this._netConfig
+              this._netConfig,
             );
           }
           //If tile was downloaded from net with 200 code
@@ -294,7 +294,7 @@ class Downloader {
                 jobTile.z,
                 jobTile.x,
                 jobTile.y,
-                TileInCache.present
+                TileInCache.present,
               );
           }
           //If tile was downloaded from net with 404 code
@@ -309,7 +309,7 @@ class Downloader {
                 jobTile.z,
                 jobTile.x,
                 jobTile.y,
-                TileInCache.empty
+                TileInCache.empty,
               );
           }
           //If tile was downloaded with all other HTTP codes

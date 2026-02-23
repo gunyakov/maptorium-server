@@ -60,9 +60,9 @@ All requests return JSON object with next interface:
 
 | PATH | Method | Params | Return | Description |
 |-|-|-|-|-|
-| `/` | `get` | none | Array<[POIInfo](./INTERFACES.md#poiinfo)> | Return Array what contain ALL POI in DB. Can be big data ammount, use with careful |
-| `/list/:categoryID` | `get` | none | Array<[POIInfo](./INTERFACES.md#poiinfo)> | Return POIs what included in specified category |
-| `/info/:poiID` | `get` | none | [POIInfo](./INTERFACES.md#poiinfo) | Return all data about POI by poiID |
+| `/` | `get` | none | GeoJSON `FeatureCollection` | Return all visible POIs in DB as GeoJSON FeatureCollection |
+| `/list/:categoryID` | `get` | none | GeoJSON `FeatureCollection` | Return POIs from specified category as GeoJSON FeatureCollection |
+| `/info/:poiID` | `get` | none | GeoJSON `Feature` | Return POI by poiID in GeoJSON Feature format |
 | `/add` | `post` | [POIInfo](./INTERFACES.md#poiinfo) | ID:number | Add POI to database and return inserted POI ID |
 | `/delete` | `post` | ID:number | none | Delete POI from DB |
 | `/update` | `post` | [POIInfo](./INTERFACES.md#poiinfo) or <br>points:Array<[GPSCoords](./INTERFACES.md#gpscoords)> | boolean | Update POI in DB. Possible to send only `points` to update GPS coords instead of properties. |

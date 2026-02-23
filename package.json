@@ -29,7 +29,7 @@
     "@turf/turf": "^7.2.0",
     "@turf/union": "^7.2.0",
     "axios": "^1.11.0",
-    "better-sqlite3": "^12.2.0",
+    "better-sqlite3": "^12.6.2",
     "cheerio": "^1.0.0",
     "client-nmea-socket-to-event": "^1.1.6",
     "colors": "^1.4.0",
@@ -51,7 +51,7 @@
     "@types/express": "^4.17.17",
     "@types/md5": "^2.3.2",
     "@types/node": "^24.1.0",
-    "cors": "^2.8.5",
+    "cors": "^2.8.6",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   },

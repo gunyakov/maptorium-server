@@ -12,7 +12,7 @@ class ExtMap extends map {
     this.storage += "/storage/ArcGIS_Vector";
     this._info = {
       id: "arcgisvector",
-      type: "layer",
+      type: "map",
       name: "ArcGIS Vector",
       submenu: "ArcGIS",
       tileSize: 512,

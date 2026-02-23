@@ -25,6 +25,86 @@ class POIHandler {
   private _dbName: string = path.join(ExecFolder, "POI.db3");
   private _routeID: number = 0;
 
+  private _poiToFeature(poi: POIInfo): false | any {
+    if (!poi.points || poi.points.length == 0) return false;
+
+    if (poi.type == POIType.point) {
+      return {
+        type: "Feature",
+        id: poi.ID,
+        properties: {
+          ID: poi.ID,
+          categoryID: poi.categoryID,
+          name: poi.name,
+          type: poi.type,
+          color: poi.color,
+          width: poi.width,
+          fillColor: poi.fillColor,
+          fillOpacity: poi.fillOpacity,
+          visible: poi.visible,
+        },
+        geometry: {
+          type: "Point",
+          coordinates: [poi.points[0].lng, poi.points[0].lat],
+        },
+      };
+    }
+
+    if (poi.type == POIType.polyline) {
+      return {
+        type: "Feature",
+        id: poi.ID,
+        properties: {
+          ID: poi.ID,
+          categoryID: poi.categoryID,
+          name: poi.name,
+          type: poi.type,
+          color: poi.color,
+          width: poi.width,
+          fillColor: poi.fillColor,
+          fillOpacity: poi.fillOpacity,
+          visible: poi.visible,
+        },
+        geometry: {
+          type: "LineString",
+          coordinates: poi.points.map((point) => [point.lng, point.lat]),
+        },
+      };
+    }
+
+    if (poi.type == POIType.polygon) {
+      let ring = poi.points.map((point) => [point.lng, point.lat]);
+      let first = ring[0];
+      let last = ring[ring.length - 1];
+
+      if (first[0] != last[0] || first[1] != last[1]) {
+        ring.push([first[0], first[1]]);
+      }
+
+      return {
+        type: "Feature",
+        id: poi.ID,
+        properties: {
+          ID: poi.ID,
+          categoryID: poi.categoryID,
+          name: poi.name,
+          type: poi.type,
+          color: poi.color,
+          width: poi.width,
+          fillColor: poi.fillColor,
+          fillOpacity: poi.fillOpacity,
+          visible: poi.visible,
+        },
+        geometry: {
+          type: "Polygon",
+          coordinates: [ring],
+        },
+      };
+    }
+
+    return false;
+  }
+
   constructor() {
     this.checkDB();
   }
@@ -61,8 +141,9 @@ class POIHandler {
   async get(
     ID: number = 0,
     categoryID: number = 0,
-    visible: number = 1
-  ): Promise<false | Array<POIInfo>> {
+    visible: number = 1,
+    geoJSON: boolean = false
+  ): Promise<false | Array<POIInfo> | any> {
     let result: false | Array<POIInfo> = false;
     if (ID == 0 && categoryID == 0) {
       result = (await sqlite3.all(
@@ -103,7 +184,24 @@ class POIHandler {
           }
         }
       }
-      if (data.length > 0) return data;
+      if (data.length > 0) {
+        if (!geoJSON) return data;
+
+        let features = data
+          .map((poi) => this._poiToFeature(poi))
+          .filter((feature) => feature);
+
+        if (features.length == 0) return false;
+
+        if (ID > 0 && categoryID == 0 && features.length == 1) {
+          return features[0];
+        }
+
+        return {
+          type: "FeatureCollection",
+          features,
+        };
+      }
       else return false;
     } else return false;
   }

@@ -9,13 +9,16 @@ router.use(express.urlencoded({ extended: true }));
 //Worker handler
 //------------------------------------------------------------------------------
 import JobManager from "../src/jobmanager";
-import POI from "../src/poi";
 //------------------------------------------------------------------------------
 //Config
 //------------------------------------------------------------------------------
 import { GenJobInfo, iJobConfig } from "../src/interface";
 import { checkMapHandler } from "../maps";
 import defConfig from "../config/config";
+import {
+  validateDownloadJobRequest,
+  validateGenerateJobRequest,
+} from "../helpers/validate";
 //------------------------------------------------------------------------------
 //HTTP Server: Request to get jobs list
 //------------------------------------------------------------------------------
@@ -24,27 +27,17 @@ router.get("/list", async function (req, res) {
   if (jobList.length > 0) {
     res.json({ result: "success", data: jobList });
   } else {
-    res.json({ result: "warning", message: "Job list is empty." });
+    res.json({ result: "warning", message: "request.job.list.empty" });
   }
 });
 //------------------------------------------------------------------------------
 //HTTP Server: Request to download job
 //------------------------------------------------------------------------------
 router.post("/download", async function (req, res) {
-  function checkType<T>(data: T, interfaceObj: any): true | string {
-    for (const key in interfaceObj) {
-      if (key === "network" && data["customNetworkConfig"] === false) continue;
-      if (typeof interfaceObj[key] === "object") {
-        if (!checkType(data[key], interfaceObj[key])) {
-          return key;
-        }
-      } else if (typeof data[key] !== typeof interfaceObj[key]) return key;
-    }
-    return true;
-  }
   //Default job settings
-  let JobConfig: iJobConfig = {
+  let jobConfig: iJobConfig = {
     polygonID: 0,
+    polygon: [],
     download: {
       ...defConfig.downloader,
       ID: "0",
@@ -57,48 +50,59 @@ router.post("/download", async function (req, res) {
     customNetworkConfig: false,
     network: defConfig.network,
   };
-  //console.log(req.body, JobConfig);
-  //Check that request body has all keys from interface
-  const result = checkType(req.body, JobConfig);
-  if (result === true) {
-    if (!checkMapHandler(req.body?.download?.mapID)) {
-      res.json({
-        result: "error",
-        message: "Cant find map handler by map ID. Skip.",
-      });
-      return;
-    }
-    if (!(await POI.checkPOI(parseInt(req.body?.polygonID)))) {
-      res.json({
-        result: "error",
-        message: "Cant find POI by ID. Skip.",
-      });
-      return;
-    }
-    if (Object.keys(req.body?.download?.zoom).length < 1) {
-      res.json({ result: "error", message: "Zooms list is empty." });
-      return;
-    }
-  } else {
+
+  const validation = validateDownloadJobRequest(req.body);
+  if (!validation.ok) {
     res.json({
       result: "warning",
-      message: `Key <b>${result}</b> not same as described in interface. Skip add job to queue.`,
+      message:
+        "messageKey" in validation
+          ? validation.messageKey
+          : "request.job.validation.body_invalid",
     });
     return;
   }
-  JobManager.add(req.body);
-  res.json({ result: "success", message: "Job added to queue." });
+
+  const downloadData = validation.data.download;
+  const polygonData = validation.data.polygon;
+  const customNetworkConfig = validation.data.customNetworkConfig;
+  const networkData = validation.data.network;
+
+  if (!checkMapHandler(downloadData.mapID)) {
+    res.json({
+      result: "error",
+      message: "request.job.validation.map_handler_missing",
+    });
+    return;
+  }
+
+  jobConfig = {
+    ...jobConfig,
+    polygonID: validation.data.polygonID,
+    polygon: polygonData,
+    customNetworkConfig,
+    network: customNetworkConfig ? networkData : defConfig.network,
+    download: {
+      ...jobConfig.download,
+      ...downloadData,
+      ID: "0",
+      threadsCounter: defConfig.service.threads,
+    },
+  };
+
+  JobManager.add(jobConfig);
+  res.json({ result: "success", message: "request.job.download.added" });
 });
 //------------------------------------------------------------------------------
 //HTTP Server: Request to start job
 //------------------------------------------------------------------------------
 router.get("/start/:jobID", async (req, res) => {
   if (await JobManager.start(req.params.jobID)) {
-    res.json({ result: "success", message: "Job was started." });
+    res.json({ result: "success", message: "request.job.start.success" });
   } else {
     res.json({
       result: "warning",
-      message: "Cant find job in queue by ID. Skip",
+      message: "request.job.queue.job_not_found",
     });
   }
 });
@@ -107,11 +111,11 @@ router.get("/start/:jobID", async (req, res) => {
 //------------------------------------------------------------------------------
 router.get("/stop/:jobID", async (req, res) => {
   if (await JobManager.stop(req.params.jobID)) {
-    res.json({ result: "success", message: "Job was stoped." });
+    res.json({ result: "success", message: "request.job.stop.success" });
   } else {
     res.json({
       result: "warning",
-      message: "Cant find job in queue by ID. Skip",
+      message: "request.job.queue.job_not_found",
     });
   }
 });
@@ -120,9 +124,9 @@ router.get("/stop/:jobID", async (req, res) => {
 //------------------------------------------------------------------------------
 router.get("/up/:jobID", async function (req, res) {
   if (await JobManager.up(req.params.jobID)) {
-    res.json({ result: "success", message: "Job was moved UP in queue." });
+    res.json({ result: "success", message: "request.job.up.success" });
   } else {
-    res.json({ result: "error", message: "Job cant be moved UP in queue." });
+    res.json({ result: "error", message: "request.job.up.failed" });
   }
 });
 //------------------------------------------------------------------------------
@@ -130,9 +134,9 @@ router.get("/up/:jobID", async function (req, res) {
 //------------------------------------------------------------------------------
 router.get("/down/:jobID", async function (req, res) {
   if (await JobManager.down(req.params.jobID)) {
-    res.json({ result: "success", message: "Job was moved DOWN in queue." });
+    res.json({ result: "success", message: "request.job.down.success" });
   } else {
-    res.json({ result: "error", message: "Job cant be moved DOWN in queue." });
+    res.json({ result: "error", message: "request.job.down.failed" });
   }
 });
 //------------------------------------------------------------------------------
@@ -140,78 +144,50 @@ router.get("/down/:jobID", async function (req, res) {
 //------------------------------------------------------------------------------
 router.get("/delete/:jobID", async function (req, res) {
   if (await JobManager.delete(req.params.jobID)) {
-    res.json({ result: "success", message: "Job was deleted from queue." });
+    res.json({ result: "success", message: "request.job.delete.success" });
   } else {
-    res.json({ result: "error", message: "Job cant be deleted from queue." });
+    res.json({ result: "error", message: "request.job.delete.failed" });
   }
 });
 //------------------------------------------------------------------------------
 //HTTP Server: Request to generate map job
 //------------------------------------------------------------------------------
 router.post("/generate", async function (req, res) {
-  //Default job settings
-  let jobConfig: GenJobInfo = {
-    ID: "some jobID",
-    polygonID: "0",
-    mapID: "none",
-    zoom: ["0"],
-    updateTiles: false,
-    completeTiles: false,
-    fromZoom: "0",
-    previousZoom: false,
-  };
-  //Make checkings and merging of jobConfig and default job settins
-  for (const key in jobConfig) {
-    if (typeof jobConfig[key as keyof GenJobInfo] != typeof req.body[key]) {
-      res.json({
-        result: "warning",
-        message: `Key <b>${key}</b> not same as described in interface. Skip add job to queue.`,
-      });
-      return;
-    } else {
-      let value = req.body[key];
-      switch (key) {
-        case "mapID":
-          if (!checkMapHandler(value)) {
-            res.json({
-              result: "error",
-              message: "Cant find map handler by map ID. Skip.",
-            });
-            return;
-          }
-          break;
-        case "polygonID":
-          if (!(await POI.checkPOI(parseInt(value)))) {
-            res.json({
-              result: "error",
-              message: "Cant find POI by ID. Skip.",
-            });
-            return;
-          }
-          break;
-        case "zoom":
-          if (value.length < 1) {
-            res.json({ result: "error", message: "Zooms list is empty." });
-            return;
-          }
-      }
-      //@ts-ignore
-      jobConfig[key as keyof JobInfo] = value;
-    }
+  const validation = validateGenerateJobRequest(req.body);
+  if (!validation.ok) {
+    res.json({
+      result: "warning",
+      message:
+        "messageKey" in validation
+          ? validation.messageKey
+          : "request.job.validation.body_invalid",
+    });
+    return;
   }
+
+  const jobConfig: GenJobInfo = validation.data;
+
+  if (!checkMapHandler(jobConfig.mapID)) {
+    res.json({
+      result: "error",
+      message: "request.job.validation.map_handler_missing",
+    });
+    return;
+  }
+
   for (let i = 0; i < jobConfig.zoom.length; i++) {
     let fromZoom = parseInt(jobConfig.fromZoom);
     let keyZoom = parseInt(jobConfig.zoom[i]);
     if (keyZoom >= fromZoom) {
       res.json({
         result: "error",
-        message: "Generated zooms must be less than base zoom.",
+        message: "request.job.validation.generate_zoom_relation_invalid",
       });
       return;
     }
   }
   JobManager.addGen(jobConfig);
-  res.json({ result: "success", message: "Job added to queue." });
+  res.json({ result: "success", message: "request.job.generate.added" });
 });
 
 export default router;

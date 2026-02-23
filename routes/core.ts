@@ -5,11 +5,13 @@ import express from "express";
 const router = express.Router();
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
+import { existsSync, statSync } from "node:fs";
+import path from "node:path";
 //------------------------------------------------------------------------------
 //GPS service
 //------------------------------------------------------------------------------
 import GPS from "../gps/gps";
-import { arrMapsInfo } from "../maps";
+import { getMapsInfo, setMapStoragePath } from "../maps";
 //------------------------------------------------------------------------------
 //Statistics
 //------------------------------------------------------------------------------
@@ -71,7 +73,7 @@ router.post("/default", async (req, res) => {
         //Return error
         return res.json({
           result: "error",
-          message: "Cant read map ID from request.",
+          message: "request.core.default.api_keys.map_id_read_failed",
         });
       //If maps ID list present
       for (let i = 0; i < mapID.length; i++) {
@@ -85,7 +87,7 @@ router.post("/default", async (req, res) => {
           //Return error
           return res.json({
             result: "error",
-            message: "Map ID is missng in maps list. Pls check Map ID.",
+            message: "request.core.default.api_keys.map_id_missing",
           });
         }
       }
@@ -101,11 +103,11 @@ router.post("/default", async (req, res) => {
     }
   }
   if (await saveDefConfig()) {
-    res.json({ result: "success", message: "Default config was updated." });
+    res.json({ result: "success", message: "request.core.default.updated" });
   } else {
     res.json({
       result: "warning",
-      message: "Default config was updated, but some config saving error.",
+      message: "request.core.default.updated_with_save_warning",
     });
   }
 });
@@ -115,7 +117,46 @@ router.get("/default", async (req, res) => {
 });
 
 router.get("/maps", async (req, res) => {
-  res.json({ result: "success", data: [...arrMapsInfo] });
+  res.json({ result: "success", data: [...getMapsInfo()] });
+});
+
+router.post("/map-storage", async (req, res) => {
+  const mapID = String(req.body?.mapID || "").trim();
+  const storagePath = String(req.body?.path || "").trim();
+
+  if (!mapID) {
+    return res.json({
+      result: "error",
+      message: "request.core.map_storage.map_id_missing",
+    });
+  }
+
+  if (!storagePath) {
+    return res.json({
+      result: "error",
+      message: "request.core.map_storage.path_missing",
+    });
+  }
+
+  const resolvedPath = path.resolve(storagePath);
+  if (!existsSync(resolvedPath) || !statSync(resolvedPath).isDirectory()) {
+    return res.json({
+      result: "error",
+      message: "request.core.map_storage.path_invalid",
+    });
+  }
+
+  if (!(await setMapStoragePath(mapID, resolvedPath, true))) {
+    return res.json({
+      result: "warning",
+      message: "request.core.map_storage.update_failed",
+    });
+  }
+
+  return res.json({
+    result: "success",
+    message: "request.core.map_storage.updated",
+  });
 });
 
 router.post("/mode", async (req, res) => {
@@ -129,11 +170,11 @@ router.post("/mode", async (req, res) => {
   config.network.state = mode;
 
   if (await setDefConfig("mode", mode)) {
-    res.json({ result: "success", message: "Network mode was updated." });
+    res.json({ result: "success", message: "request.core.mode.updated" });
   } else {
     res.json({
       result: "warning",
-      message: "Network mode was changed, but some config saving error.",
+      message: "request.core.mode.updated_with_save_warning",
     });
   }
 });

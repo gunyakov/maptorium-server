@@ -20,7 +20,12 @@ import { Tile, MapInfo, iNetworkConfig } from "./interface";
 const ExecFolder = process.cwd();
 import path from "path";
 class MapHandler {
-  protected storage = path.join(ExecFolder, "..");
+  // Alias for compatibility with setMapStoragePath usage
+  public setpath(storagePath: string) {
+    return this.setPath(storagePath);
+  }
+  //protected storage = path.join(ExecFolder, "..");
+  protected storage = "/media/oleg/01DA418936B8B2D0";
   protected _mapVersion = 0;
   //To overwrite in Extended class
   protected _info: MapInfo = {
@@ -34,7 +39,7 @@ class MapHandler {
     format: "rasted",
     encoding: "none",
     apiKey: "",
-    headers: {},
+    headers: undefined,
   };
 
   constructor() {}
@@ -42,7 +47,18 @@ class MapHandler {
   //Return info of Map
   //----------------------------------------------------------------------------
   public getInfo() {
-    return this._info;
+    return { ...this._info, storagePath: this.storage };
+  }
+
+  public setPath(storagePath: string) {
+    const nextPath = String(storagePath || "").trim();
+    if (!nextPath) return false;
+    this.storage = path.resolve(nextPath);
+    return true;
+  }
+
+  public getPath() {
+    return this.storage;
   }
   //----------------------------------------------------------------------------
   //Return tile download link. To be overwrite in real MAP module
@@ -57,7 +73,7 @@ class MapHandler {
     z: number,
     x: number,
     y: number,
-    netConfig?: iNetworkConfig
+    netConfig?: iNetworkConfig,
   ) {
     let tileUrl = await this.getURL(z, x, y);
     let http = new httpEngine(netConfig, this._info.headers);
@@ -71,7 +87,7 @@ class MapHandler {
     z: number,
     x: number,
     y: number,
-    netConfig?: iNetworkConfig
+    netConfig?: iNetworkConfig,
   ): Promise<[code: number, response: string, size: number]> {
     let http = await this._getTileFromNetwork(z, x, y, netConfig);
     //If empty tile
@@ -84,7 +100,7 @@ class MapHandler {
         this.storage,
         Buffer.alloc(0),
         0,
-        this._mapVersion
+        this._mapVersion,
       );
     }
     //If tile not empty
@@ -97,7 +113,7 @@ class MapHandler {
         this.storage,
         http.response as unknown as Buffer,
         http.byteLength,
-        this._mapVersion
+        this._mapVersion,
       );
     }
     return [http.code, http.response, http.byteLength];
@@ -109,7 +125,7 @@ class MapHandler {
     z: number,
     x: number,
     y: number,
-    netConfig?: iNetworkConfig
+    netConfig?: iNetworkConfig,
   ): Promise<[code: number, response: string, size: number]> {
     let http = await this._getTileFromNetwork(z, x, y, netConfig);
     //If empty tile
@@ -122,7 +138,7 @@ class MapHandler {
         this.storage,
         Buffer.alloc(0),
         0,
-        this._mapVersion
+        this._mapVersion,
       );
     }
     //If tile not empty
@@ -135,7 +151,7 @@ class MapHandler {
         this.storage,
         http.response as unknown as Buffer,
         http.byteLength,
-        this._mapVersion
+        this._mapVersion,
       );
     }
     return [http.code, http.response, http.byteLength];
@@ -151,7 +167,7 @@ class MapHandler {
     z: number,
     x: number,
     y: number,
-    getFull: boolean
+    getFull: boolean,
   ): Promise<[result: boolean, tile: Tile]> {
     //Try to get tile from TileStorage
     let tile = (await TileStorage.getTile(
@@ -159,7 +175,7 @@ class MapHandler {
       x,
       y,
       this.storage,
-      getFull
+      getFull,
     )) as Tile;
     //If tile is present in TileStorage
     if (tile) return [true, tile];
@@ -181,7 +197,7 @@ class MapHandler {
     z: number,
     x: number,
     y: number,
-    tile: Buffer
+    tile: Buffer,
   ): Promise<boolean> {
     let byteLength = Buffer.byteLength(tile);
     //Insert or update tile in TileStorage

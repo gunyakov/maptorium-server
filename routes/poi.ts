@@ -14,7 +14,6 @@ import { LogModules } from "../src/enum";
 //Geometry handler
 //------------------------------------------------------------------------------
 import POI from "../src/poi";
-import { POIInfo } from "../src/interface";
 //------------------------------------------------------------------------------
 //MARKS: Get categories list
 //------------------------------------------------------------------------------
@@ -23,7 +22,7 @@ router.get("/category", async (req, res) => {
   if (categoryList) {
     res.json({ result: "success", data: categoryList });
   } else {
-    res.json({ result: "error", message: "Category list empty." });
+    res.json({ result: "error", message: "request.poi.category.list_empty" });
   }
 });
 //------------------------------------------------------------------------------
@@ -34,7 +33,7 @@ router.get("/category/:categoryID", async (req, res) => {
   if (categoryList) {
     res.json({ result: "success", data: categoryList[0] });
   } else {
-    res.json({ result: "error", message: "Category list empty." });
+    res.json({ result: "error", message: "request.poi.category.list_empty" });
   }
 });
 //------------------------------------------------------------------------------
@@ -45,11 +44,11 @@ router.post("/category/add", async (req, res) => {
   if (typeof result == "number") {
     res.json({
       result: "success",
-      message: "Category was inserted in DB.",
+      message: "request.poi.category.add.success",
       data: { ID: result },
     });
   } else {
-    res.json({ result: "error", message: "Some error to add Category to DB." });
+    res.json({ result: "error", message: "request.poi.category.add.failed" });
   }
 });
 //------------------------------------------------------------------------------
@@ -60,12 +59,12 @@ router.post("/category/update", async (req, res) => {
   if (result) {
     res.json({
       result: "success",
-      message: "Category was updated in DB.",
+      message: "request.poi.category.update.success",
     });
   } else {
     res.json({
       result: "error",
-      message: "Some error during updating Category in DB.",
+      message: "request.poi.category.update.failed",
     });
   }
 });
@@ -75,11 +74,14 @@ router.post("/category/update", async (req, res) => {
 router.post("/category/delete", async (req, res) => {
   let result = await POI.categoryDelete(req.body.ID);
   if (result) {
-    res.json({ result: "success", message: "Category was deleted from DB." });
+    res.json({
+      result: "success",
+      message: "request.poi.category.delete.success",
+    });
   } else {
     res.json({
       result: "error",
-      message: "Some error to delete Category from DB.",
+      message: "request.poi.category.delete.failed",
     });
   }
 });
@@ -87,11 +89,11 @@ router.post("/category/delete", async (req, res) => {
 //MARKS: Get info about mark
 //------------------------------------------------------------------------------
 router.get("/info/:poiID", async (req, res) => {
-  let marks = (await POI.get(parseInt(req.params.poiID))) as Array<POIInfo>;
-  if (marks) {
-    res.json({ result: "success", data: marks[0] });
+  let mark = await POI.get(parseInt(req.params.poiID), 0, 1, true);
+  if (mark) {
+    res.json({ result: "success", data: mark });
   } else {
-    res.json({ result: "error", message: "No data about mark in DB." });
+    res.json({ result: "error", message: "request.poi.info.not_found" });
   }
 });
 //------------------------------------------------------------------------------
@@ -122,25 +124,28 @@ router.post("/update", async (req, res) => {
         if (result) {
           res.json({
             result: "success",
-            message: "POI was updated.",
+            message: "request.poi.update.success",
             data: result,
           });
         } else {
-          res.json({ result: "error", message: "Error to update POI." });
+          res.json({ result: "error", message: "request.poi.update.failed" });
         }
       } else {
         res.json({
           result: "warning",
-          message: "Empty data for POI. Skip update.",
+          message: "request.poi.update.empty_data",
         });
       }
     }
   } catch (e) {
     if (e instanceof Error) {
-      res.json({ result: "error", message: e.message });
+      res.json({ result: "error", message: "request.poi.update.exception" });
       Log.error(LogModules.main, "POI UPDATE REQUEST: " + e.message);
     } else {
-      res.json({ result: "error", message: "Unknown error occured." });
+      res.json({
+        result: "error",
+        message: "request.poi.update.exception_unknown",
+      });
       Log.error(LogModules.main, "POI UPDATE REQUEST: Unknown error occured.");
     }
   }
@@ -149,22 +154,22 @@ router.post("/update", async (req, res) => {
 //MARKS: Get marks list of specific category
 //------------------------------------------------------------------------------
 router.get("/list/:categoryID", async (req, res) => {
-  let poi = await POI.get(0, parseInt(req.params.categoryID));
+  let poi = await POI.get(0, parseInt(req.params.categoryID), 1, true);
   if (poi) {
     res.json({ result: "success", data: poi });
   } else {
-    res.json({ result: "error", message: "Category is empty." });
+    res.json({ result: "error", message: "request.poi.list.category_empty" });
   }
 });
 //------------------------------------------------------------------------------
 //MARKS: Get full marks list
 //------------------------------------------------------------------------------
 router.get("/", async (req, res) => {
-  let poi = await POI.get();
+  let poi = await POI.get(0, 0, 1, true);
   if (poi) {
     res.json({ result: "success", data: poi });
   } else {
-    res.json({ result: "error", message: "Category is empty." });
+    res.json({ result: "error", message: "request.poi.list.category_empty" });
   }
 });
 //------------------------------------------------------------------------------
@@ -173,15 +178,15 @@ router.get("/", async (req, res) => {
 router.post("/delete", async (req, res) => {
   if (req.body.ID) {
     if (await POI.delete(req.body.ID)) {
-      res.json({ result: "success", message: "POI was deleted from map." });
+      res.json({ result: "success", message: "request.poi.delete.success" });
     } else {
       res.json({
         result: "error",
-        message: "Its error to delete POI from DB.",
+        message: "request.poi.delete.failed",
       });
     }
   } else {
-    res.json({ result: "warning", message: "PoiID is empty. Skip." });
+    res.json({ result: "warning", message: "request.poi.delete.id_empty" });
   }
 });
 //------------------------------------------------------------------------------
@@ -194,21 +199,24 @@ router.post("/add", async (req, res) => {
       if (typeof result === "number" && result > 0) {
         res.json({
           result: "success",
-          message: "POI was added to DB.",
+          message: "request.poi.add.success",
           data: { ID: result },
         });
       } else {
-        res.json({ result: "error", message: "Error to add POI to DB." });
+        res.json({ result: "error", message: "request.poi.add.failed" });
       }
     } else {
-      res.json({ result: "error", message: "Empty data sended to server." });
+      res.json({ result: "error", message: "request.poi.add.empty_data" });
     }
   } catch (e) {
     if (e instanceof Error) {
-      res.json({ result: "error", message: e.message });
+      res.json({ result: "error", message: "request.poi.add.exception" });
       Log.error(LogModules.main, "POI ADD REQUEST: " + e.message);
     } else {
-      res.json({ result: "error", message: "Unknown error occured." });
+      res.json({
+        result: "error",
+        message: "request.poi.add.exception_unknown",
+      });
       Log.error(LogModules.main, "POI ADD REQUEST: Unknown error occured.");
     }
   }
@@ -220,7 +228,7 @@ router.post("/addMark", async (req, res) => {
   if (typeof req.body.name != "string") {
     res.json({
       result: "warning",
-      message: "Cant read Name value. Skip Add Mark.",
+      message: "request.poi.mark_add.name_invalid",
     });
     return;
   }
@@ -228,7 +236,7 @@ router.post("/addMark", async (req, res) => {
   if (categoryID < 0) {
     res.json({
       result: "warning",
-      message: "Cant read Category ID value. Skip Add Mark.",
+      message: "request.poi.mark_add.category_id_invalid",
     });
     return;
   }
@@ -237,7 +245,7 @@ router.post("/addMark", async (req, res) => {
   if (lng == 0 && lat == 0) {
     res.json({
       result: "warning",
-      message: "Cant read LNG or LAT value. Skip Add Mark.",
+      message: "request.poi.mark_add.coords_invalid",
     });
     return;
   }
@@ -245,11 +253,11 @@ router.post("/addMark", async (req, res) => {
   if (result > 0) {
     res.json({
       result: "success",
-      message: "Mark was added to DB.",
+      message: "request.poi.mark_add.success",
       data: { ID: result },
     });
   } else {
-    res.json({ result: "error", message: "Error to add Mark to DB." });
+    res.json({ result: "error", message: "request.poi.mark_add.failed" });
   }
 });
 
