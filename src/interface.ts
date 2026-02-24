@@ -10,7 +10,7 @@ import {
   JobType,
   GPSType,
 } from "./enum";
-import type { AxiosRequestHeaders } from "axios";
+import type { RawAxiosRequestHeaders } from "axios";
 
 export type LogArray = {
   [id in LogType]: Array<string>;
@@ -84,7 +84,7 @@ export interface MapInfo {
   format: string;
   encoding: "gzip" | "none";
   apiKey?: string;
-  headers?: AxiosRequestHeaders;
+  headers?: RawAxiosRequestHeaders;
   storagePath?: string;
 }
 

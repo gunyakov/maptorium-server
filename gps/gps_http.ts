@@ -27,7 +27,7 @@ class GPS_HTTP extends GPS_CORE {
   public async config(
     host: string,
     port: number,
-    stopAndStart: boolean = false
+    stopAndStart: boolean = false,
   ) {
     this._host = host;
     this._port = port;
@@ -40,7 +40,14 @@ class GPS_HTTP extends GPS_CORE {
   //----------------------------------------------------------------------------
   //Function to get GPS from external source
   //----------------------------------------------------------------------------
-  public async getGPSCoords() {
+  public async getGPSCoords(): Promise<
+    | false
+    | {
+        lat: number;
+        lng: number;
+        dir: number;
+      }
+  > {
     //You can import functions from httpJsonServer file and use there.
     //All other like timing beetwen request and so one will be handled in auto by this class.
     let lat = 0;
@@ -52,7 +59,7 @@ class GPS_HTTP extends GPS_CORE {
       true,
       "get",
       "",
-      "JSESSIONID=2206FC81F0525B2E3900904237975B28"
+      "JSESSIONID=2206FC81F0525B2E3900904237975B28",
     );
     //If server return proper responce
     if (http.code == 200) {
@@ -64,7 +71,14 @@ class GPS_HTTP extends GPS_CORE {
       this._lat = lat;
       this._lng = lng;
       this._update = true;
+      return {
+        lat,
+        lng,
+        dir: this._dir,
+      };
     }
+
+    return false;
   }
 }
 

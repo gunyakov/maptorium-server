@@ -1,17 +1,57 @@
 {
   "name": "maptorium-server",
-  "version": "3.2.2",
+  "version": "4.0.0",
   "description": "Maptorium http api server.",
   "bin": "index.js",
-  "main": "index.tsx",
+  "main": "main.js",
   "scripts": {
     "start": "npx tsx index.tsx",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc"
+    "build": "npx tsc -p .",
+    "backup:poi": "npx tsx scripts/export-poi-backup.ts",
+    "rebuild": "npx electron-builder install-app-deps",
+    "postinstall": "npm run rebuild",
+    "dist:win": "npx electron-builder --win portable",
+    "dist:linux": "npx electron-builder --linux AppImage --x64",
+    "pack": "npx electron-builder --dir"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gunyakov/maptorium-server.git"
+  },
+  "build": {
+    "appId": "net.maptorium",
+    "files": [
+      "**/*"
+    ],
+    "icon": "icons",
+    "extraResources": [
+      "icons/**",
+      "config.user.json",
+      "public_html/**"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "**/node_modules/sharp/**",
+      "**/node_modules/@img/**",
+      "**/node_modules/better-sqlite3/**",
+      "**/node_modules/serialport/**"
+    ],
+    "linux": {
+      "icon": "icons/icon.png",
+      "category": "Education",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "mac": {
+      "icon": "icons/icon.icns"
+    }
   },
   "keywords": [
     "google",
@@ -26,52 +66,39 @@
   },
   "homepage": "https://github.com/gunyakov/maptorium#readme",
   "dependencies": {
-    "@turf/turf": "^7.2.0",
-    "@turf/union": "^7.2.0",
-    "axios": "^1.11.0",
+    "@turf/turf": "^7.3.4",
+    "@turf/union": "^7.3.4",
+    "axios": "^1.13.5",
     "better-sqlite3": "^12.6.2",
-    "cheerio": "^1.0.0",
+    "cheerio": "^1.2.0",
     "client-nmea-socket-to-event": "^1.1.6",
     "colors": "^1.4.0",
     "crc-32": "^1.2.2",
-    "express": "^5.1.0",
-    "https-proxy-agent": "^7.0.5",
-    "ink": "^4.3.1",
+    "express": "^5.2.1",
+    "https-proxy-agent": "^7.0.6",
+    "@electron/remote": "^2.1.3",
+    "ink": "^6.8.0",
     "md5": "^2.3.0",
-    "moment": "^2.29.4",
+    "moment": "^2.30.1",
     "nmea-simple": "^3.3.0",
     "serialport": "^13.0.0",
-    "sharp": "^0.34.3",
-    "socket.io": "^4.8.1",
+    "sharp": "^0.34.5",
+    "socket.io": "^4.8.3",
     "socketstream2event": "^1.1.0",
-    "socks-proxy-agent": "^8.0.4"
+    "socks-proxy-agent": "^8.0.5"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
-    "@types/express": "^4.17.17",
-    "@types/md5": "^2.3.2",
-    "@types/node": "^24.1.0",
+    "@types/express": "^5.0.6",
+    "@types/md5": "^2.3.6",
+    "@types/node": "^25.3.0",
     "cors": "^2.8.6",
-    "tsx": "^4.20.3",
-    "typescript": "^5.8.3"
+    "electron": "^40.6.0",
+    "electron-builder": "^26.8.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   },
-  "pkg": {
-    "scripts": [
-      "config/*.js",
-      "DB/*.js",
-      "src/*.js",
-      "maps/*.js",
-      "routes/*.js",
-      "helpers/*.js",
-      "gps/*.js",
-      "converter/*.js"
-    ],
-    "assets": [
-      "node_modules/axios/dist/node/axios.cjs"
-    ],
-    "targets": [
-      "node18-win"
-    ],
-    "outputPath": "."
+  "overrides": {
+    "minimatch": ">=10.2.1"
   }
 }

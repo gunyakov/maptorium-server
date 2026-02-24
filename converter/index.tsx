@@ -1,5 +1,6 @@
 import Database from "better-sqlite3";
 import wait from "../helpers/wait";
+import type { Tile } from "./interface";
 //------------------------------------------------------------------------------
 //MD5 to store DB file name in list
 //------------------------------------------------------------------------------
@@ -67,7 +68,7 @@ async function getTiles() {
         `Start MBTiles request with ${offset} offset.`
       );
       //Get tiles from DB
-      let tiles = (await stmt.all([step, offset])) as [Tile];
+      let tiles = (await stmt.all([step, offset])) as Array<Tile>;
       //Set new offset
       offset += step;
       console.log(
