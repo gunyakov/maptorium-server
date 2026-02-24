@@ -30,6 +30,9 @@ export default function (httpServer: any): Server {
     socket.on("disconnect", () => {
       Log.info(LogModules.main, "User disconnected.");
     });
+    socket.on("ping", () => {
+      socket.emit("pong");
+    });
   });
 
   IO = io;
