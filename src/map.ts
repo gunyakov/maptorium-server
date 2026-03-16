@@ -25,7 +25,7 @@ class MapHandler {
     return this.setPath(storagePath);
   }
   //protected storage = path.join(ExecFolder, "..");
-  protected storage = "/media/oleg/01DA418936B8B2D0";
+  protected storage = path.join(ExecFolder, "storage");
   protected _mapVersion = 0;
   //To overwrite in Extended class
   protected _info: MapInfo = {
@@ -36,7 +36,7 @@ class MapHandler {
     tileSize: 256,
     attribution: "",
     content: "image/png",
-    format: "rasted",
+    format: "raster",
     encoding: "none",
     apiKey: "",
     headers: undefined,

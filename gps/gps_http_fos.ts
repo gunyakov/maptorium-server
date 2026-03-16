@@ -9,7 +9,6 @@ import Log from "../src/log";
 import axios from "axios";
 import https from "https";
 import { LogModules } from "../src/enum";
-https.globalAgent.options.rejectUnauthorized = false;
 
 //------------------------------------------------------------------------------
 //FOS BRIDGE 5.03 interface
@@ -103,7 +102,11 @@ class GPS_HTTP extends GPS_CORE {
       axios
         .get(`https://${this._host}:${this._port}/${this._path}`, {
           responseType: "json",
-          httpsAgent: new https.Agent(),
+          // Scope self-signed cert acceptance to this FOS endpoint only.
+          httpsAgent: new https.Agent({
+            keepAlive: true,
+            rejectUnauthorized: false,
+          }),
         })
         .then((response) => {
           if (response.status == 200) {
@@ -115,7 +118,7 @@ class GPS_HTTP extends GPS_CORE {
           }
         })
         .catch((e) => {
-          Log.error(LogModules.gps, "FOS HTTPS Request Error");
+          Log.error(LogModules.gps, "FOS HTTPS Request Error: " + e?.message);
           resolve(false);
         });
     });

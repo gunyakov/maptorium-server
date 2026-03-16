@@ -186,6 +186,7 @@ class GPS_CORE {
         if (this._lastLng != this._lng || this._lastLat != this._lat) {
           //Send GPS coords by socket.io to client
           sendGPS(this._lat, this._lng, this._dir);
+          //console.log('New GPS coords', { lat: this._lat, lng: this._lng, dir: this._dir });
           //Call callback, if registered
           if (this._callback) {
             this._callback({

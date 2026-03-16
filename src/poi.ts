@@ -123,7 +123,7 @@ class POIHandler {
         Log.error(LogModules.poi, "Cant make POI DB. Pls check location.");
       }
     }
-    //this.routeGetID();
+    this.routeGetID();
   }
   //------------------------------------------------------------------------------
   //Check if POI present in DB

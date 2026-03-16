@@ -47,7 +47,7 @@ class Log {
     ) {
       type = LogType.info;
     }
-    while (!isConfigReady) await wait(1000);
+    while (!isConfigReady()) await wait(1000);
     //If entries counter more than set in config
     if (this.arrLog[type].length > config.log.length) {
       //Delete first entry from log
