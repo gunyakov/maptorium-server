@@ -17,7 +17,9 @@ import { sendRoutePoint } from "./io";
 //------------------------------------------------------------------------------
 import { existsSync } from "fs";
 import path from "path";
-const ExecFolder = process.cwd();
+// In packaged builds main.ts points this at Electron's writable userData dir;
+// falls back to cwd for `npm start` development.
+const ExecFolder = process.env.MAPTORIUM_DATA_DIR || process.cwd();
 //------------------------------------------------------------------------------
 //General POI storage
 //------------------------------------------------------------------------------

@@ -37,7 +37,9 @@ function getAssetPath(...parts) {
     // resources are copied to process.resourcesPath
     return path.join(process.resourcesPath, ...parts);
   }
-  return path.join(__dirname, ...parts);
+  // unpacked dev run: compiled main.js lives in build/, assets (icons/) sit
+  // one level up at the project root
+  return path.join(__dirname, "..", ...parts);
 }
 
 const iconPath = getAssetPath(
@@ -46,20 +48,27 @@ const iconPath = getAssetPath(
 );
 
 function ensureUserConfig() {
-  const userPath = path.join(app.getPath("userData"), "config.user.json");
+  // Writable, persistent per-user directory (~/.config/<app> on Linux,
+  // %APPDATA%\<app> on Windows). config.user.json, POI.db3 and the default
+  // tile storage folder all live here — process.cwd() is not reliable once
+  // packaged (it depends on how the app was launched, and may not be writable).
+  const dataDir = app.getPath("userData");
+  fs.mkdirSync(dataDir, { recursive: true });
+  process.env.MAPTORIUM_DATA_DIR = dataDir;
+
+  const userPath = path.join(dataDir, "config.user.json");
   if (!fs.existsSync(userPath)) {
-    // packaged default is at resources path
+    // config.default.json is a sanitized template (no personal API keys /
+    // LAN addresses) shipped with the app; packaged default is at resources path
     const defaultPath = app.isPackaged
-      ? path.join(process.resourcesPath, "config.user.json")
-      : path.join(process.cwd(), "config.user.json");
+      ? path.join(process.resourcesPath, "config.default.json")
+      : path.join(process.cwd(), "config.default.json");
     try {
-      fs.mkdirSync(path.dirname(userPath), { recursive: true });
       fs.copyFileSync(defaultPath, userPath);
     } catch (e) {
       console.error("Failed to copy default config", e);
     }
   }
-  process.env.MAP_CONFIG = userPath; // point your app to the user config (optional)
 }
 
 async function createWindowAndStartServer() {

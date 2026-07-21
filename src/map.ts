@@ -17,7 +17,9 @@ import { Tile, MapInfo, iNetworkConfig } from "./interface";
 //------------------------------------------------------------------------------
 //General map handler
 //------------------------------------------------------------------------------
-const ExecFolder = process.cwd();
+// In packaged builds main.ts points this at Electron's writable userData dir;
+// falls back to cwd for `npm start` development.
+const ExecFolder = process.env.MAPTORIUM_DATA_DIR || process.cwd();
 import path from "path";
 class MapHandler {
   // Alias for compatibility with setMapStoragePath usage

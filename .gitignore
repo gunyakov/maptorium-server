@@ -38,6 +38,12 @@ bower_components
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/
 
+# Compiled TypeScript server output (`npm run build`)
+server-build/
+
+# Compiled UI (built from ../maptorium-ui via `npm run build`)
+public_html/
+
 # Dependency directories
 node_modules/
 jspm_packages/

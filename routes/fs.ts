@@ -2,6 +2,7 @@ import express from "express";
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import os from "node:os";
 
 const router = express.Router();
 router.use(express.json());
@@ -14,10 +15,12 @@ function toAbsolutePath(inputPath: string) {
 }
 
 router.get("/current", async (_req, res) => {
+  // process.cwd() is not a meaningful starting point once packaged (it
+  // depends on how the app was launched); the user's home directory is.
   res.json({
     result: "success",
     data: {
-      path: process.cwd(),
+      path: os.homedir(),
     },
   });
 });

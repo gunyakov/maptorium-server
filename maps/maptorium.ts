@@ -26,7 +26,7 @@ class ExtMap extends map {
   }
 
   async getURL(z: number, x: number, y: number): Promise<string> {
-    let url = `http://tiles.maptorium.net/${this._info.apiKey}/vector/${z}/${x}/${y}.pbf`;
+    let url = `http://tiles.maptorium.net/${this._info.apiKey}/v1/${z}/${x}/${y}.pbf`;
     return url;
   }
 }

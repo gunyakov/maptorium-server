@@ -2,12 +2,12 @@
   "name": "maptorium-server",
   "version": "4.1.0",
   "description": "Maptorium http api server.",
-  "bin": "index.js",
-  "main": "main.js",
+  "bin": "server-build/index.js",
+  "main": "server-build/main.js",
   "scripts": {
     "start": "npx tsx index.tsx",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc -p .",
+    "build": "rm -rf server-build && npx tsc -p .",
     "backup:poi": "npx tsx scripts/export-poi-backup.ts",
     "rebuild": "npx electron-builder install-app-deps",
     "postinstall": "npm run rebuild",
@@ -22,12 +22,28 @@
   "build": {
     "appId": "net.maptorium",
     "files": [
-      "**/*"
+      "**/*",
+      "!**/*.ts",
+      "!**/*.tsx",
+      "!**/*.tsbuildinfo",
+      "!tsconfig.json",
+      "!.vscode/**",
+      "!.git/**",
+      "!.gitignore",
+      "!*.md",
+      "!*.png",
+      "!POI.db3",
+      "!POI.db3-shm",
+      "!POI.db3-wal",
+      "!config.user.json",
+      "!win-on-linux.sh",
+      "!scripts/**",
+      "!package-lock.json"
     ],
     "icon": "icons",
     "extraResources": [
       "icons/**",
-      "config.user.json",
+      "config.default.json",
       "public_html/**"
     ],
     "asar": true,
@@ -51,6 +67,17 @@
     },
     "mac": {
       "icon": "icons/icon.icns"
+    },
+    "win": {
+      "icon": "icons/icon.ico",
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
     }
   },
   "keywords": [

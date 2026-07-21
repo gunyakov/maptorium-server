@@ -12,7 +12,9 @@ import { UserConfig } from "../src/interface";
 import { isConfigReady, setConfigReady } from "./shared";
 import configDef from "./config";
 
-export const ExecFolder = process.cwd();
+// In packaged builds main.ts points this at Electron's writable userData dir;
+// falls back to cwd for `npm start` development.
+export const ExecFolder = process.env.MAPTORIUM_DATA_DIR || process.cwd();
 import path from "path";
 
 let config = { ...configDef } as typeof configDef & UserConfig;

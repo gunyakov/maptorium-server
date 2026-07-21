@@ -22,6 +22,7 @@ class ExtMap extends map {
       encoding: "none",
       apiKey: "",
     };
+    this._updateApiKey();
   }
 
   async getURL(z: number, x: number, y: number): Promise<string> {
