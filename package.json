@@ -1,6 +1,6 @@
 {
   "name": "maptorium-server",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "Maptorium http api server.",
   "bin": "server-build/index.js",
   "main": "server-build/main.js",
