@@ -1,5 +1,6 @@
 {
   "name": "maptorium-server",
+  "productName": "Maptorium",
   "version": "4.1.1",
   "description": "Maptorium http api server.",
   "bin": "server-build/index.js",
@@ -11,7 +12,8 @@
     "backup:poi": "npx tsx scripts/export-poi-backup.ts",
     "rebuild": "npx electron-builder install-app-deps",
     "postinstall": "npm run rebuild",
-    "dist:win": "npx electron-builder --win portable",
+    "dist:win": "npx electron-builder --win nsis",
+    "dist:win-portable": "npx electron-builder --win portable",
     "dist:linux": "npx electron-builder --linux AppImage --x64",
     "pack": "npx electron-builder --dir"
   },
@@ -72,12 +74,29 @@
       "icon": "icons/icon.ico",
       "target": [
         {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
           "target": "portable",
           "arch": [
             "x64"
           ]
         }
       ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Maptorium",
+      "uninstallDisplayName": "Maptorium",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
     }
   },
   "keywords": [
