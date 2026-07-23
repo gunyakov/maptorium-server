@@ -14,7 +14,7 @@
     "postinstall": "npm run rebuild",
     "dist:win": "npx electron-builder --win nsis",
     "dist:win-portable": "npx electron-builder --win portable",
-    "dist:linux": "npx electron-builder --linux AppImage --x64",
+    "dist:linux": "rm -rf node_modules/better-sqlite3/build && npx electron-builder --linux AppImage --x64",
     "pack": "npx electron-builder --dir"
   },
   "repository": {

@@ -87,6 +87,12 @@ export async function start(opts: StartOptions = {}): Promise<StartResult> {
   async function close() {
     return new Promise<void>((resolve) => {
       console.log("Closing server...");
+      // Force-close lingering Socket.IO connections instead of waiting for
+      // their graceful disconnect handshake, which often doesn't complete
+      // before Electron tears the renderer down - without this, IO.close()'s
+      // callback (which only fires once every client is gone) routinely hit
+      // the 10s fallback below on every quit.
+      IO.disconnectSockets(true);
       IO.close(() => {
         console.log("Socket.IO → all clients disconnected.");
         server.close(() => {
