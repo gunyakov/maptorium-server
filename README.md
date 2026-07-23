@@ -1,4 +1,4 @@
-# maptorium-server 4.0.0
+# maptorium-server 4.1.2
 
 Maptorium 4.0 is available now. Complete new UI with vector support and other improvements. The server is Electron-ready and can be packaged into desktop applications (AppImage / portable Windows builds).
 
@@ -45,115 +45,17 @@ This is HTTP + Socket. IO API Server what can do next:
 This is a part of Maptorium project. Must work with
 Maptorium HTML UI to have all these features available.
 
-### Installation
+### Releases
 
-#### Linux/Windows users
+Precompiled builds (Windows installer, Linux AppImage) are published on the [Releases page](https://github.com/gunyakov/maptorium-server/releases/tag/v4.1.2).
 
-You must have at least version 16 of NodeJS installed in the system to run this server.
+### Build for Windows
 
-This installation is suitable for development purposes. If you look for 'ready for use' code, see `Pre Compiled code` section
+See [BUILD.md — Building for Windows](./BUILD.md#building-for-windows) for full step-by-step instructions.
 
-```
-git clone https://github.com/gunyakov/maptorium-server.git
+### Build for Linux
 
-cd maptorium-server
-
-npm install
-
-npm run start
-```
-
-<details>
-
-<summary>SQLite3 module compilation error</summary>
-
-If you have problems compiling the SQLite3 module, run the following command
-
-```
-npm install https://github.com/mapbox/node-sqlite3/tarball/master
-```
-
-</details>
-
-#### Pre Compiled code
-
-Project is write with Type Script. If you don't want to compile server and UI code into JS, you can download precompiled code from release section [here](https://github.com/gunyakov/maptorium-server/releases/tag/v3.0.0)
-
-Unpack archive, run `npm i` inside server folder and enjoy.
-
-#### Windows lazy users
-
-For Windows users, the portable version v3.0.0-win-x64 with UI is available. You can download it [here](https://github.com/gunyakov/maptorium-server/releases/tag/v3.0.0)
-
-#### Prebuilt / Releases
-
-Prebuilt releases are available for this version (v4.0.0). See the releases page for AppImage or Windows portable builds:
-
-- Releases: https://github.com/gunyakov/maptorium-server/releases/tag/v4.0.0
-
-#### Building Electron App (Linux / Windows)
-
-Prerequisites:
-
-- Node.js >= 16 (LTS recommended)
-- System build tools for native modules (on Debian/Ubuntu: `build-essential`, `python3`, `pkg-config`, `libsqlite3-dev`, `libudev-dev`, `libvips-dev`)
-- Git
-
-Basic steps to build an Electron desktop package:
-
-1. Clone and install dependencies
-
-```
-git clone https://github.com/gunyakov/maptorium-server.git
-cd maptorium-server
-npm install
-```
-
-2. Compile TypeScript to JavaScript
-
-```
-npm run build
-```
-
-3. Rebuild native modules for Electron (this runs `electron-builder install-app-deps`)
-
-```
-npm run rebuild
-```
-
-4. Create a packaged Electron application
-
-- Linux AppImage (x64):
-
-```
-npm run dist:linux
-```
-
-- Windows portable build (creates a portable .exe):
-
-```
-npm run dist:win
-```
-
-- Build unpacked directory for debugging:
-
-```
-npm run pack
-```
-
-Outputs are placed in the `dist/` folder by `electron-builder`.
-
-Notes about native modules:
-
-- This project uses native modules such as `better-sqlite3`, `sharp`, and `serialport`. Make sure system dependencies are installed before `npm install`. If you encounter compilation errors, install the required system packages and re-run `npm install` and `npm run rebuild`.
-- On some systems you may need to remove `node_modules` and re-run `npm install` after installing system packages.
-
-Development run (no packaging):
-
-```
-npm install
-npm run start
-```
+See [BUILD.md — Building for Linux](./BUILD.md#building-for-linux) for full step-by-step instructions.
 
 ### POI migration / export
 

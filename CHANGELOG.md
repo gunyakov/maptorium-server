@@ -1,5 +1,17 @@
 # maptorium-server Changelog
 
+## 4.1.2 (2026-07-23)
+
+### 🔧 Bugs
+
+- Fixed the filesystem browser (`routes/fs.ts`) used by the map storage-folder picker on Windows: listing the tree root now returns the available drives (`C:\`, `D:\`, ...) instead of resolving to the wrong location, and client-supplied paths are now validated as proper absolute paths instead of being silently reinterpreted relative to the server's working directory. This fixes "Unable to read folder" errors when browsing any folder on Windows.
+- Removed the temporary diagnostic logging in `main.ts` that was added to track down a silent packaged-app startup crash. Root cause turned out to be a corrupted `app.asar` produced by a bad build (not an application bug); a clean rebuild resolved it, so the logging (and its hardcoded dev-machine log path) is no longer needed.
+
+### 📝 Docs
+
+- Added `BUILD.md` with full step-by-step build instructions for Windows and Linux, including the requirement to clone `maptorium-server` and `maptorium-ui` as sibling folders.
+- Cleaned up `README.md`: removed the outdated Installation, precompiled-code, and prebuilt-release sections (which pointed at old v3.0.0/v4.0.0 tags) and linked out to `BUILD.md` and the GitHub Releases page instead.
+
 ## 3.2.2 (2025-07-28)
 
 ### 🔧 Bugs

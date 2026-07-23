@@ -10,8 +10,35 @@ router.use(express.urlencoded({ extended: true }));
 
 type FsNodeType = "file" | "folder";
 
-function toAbsolutePath(inputPath: string) {
-  return path.resolve(String(inputPath || "/").trim() || "/");
+const isWindows = process.platform === "win32";
+
+// Windows has no single filesystem root (paths start with a drive letter,
+// e.g. "C:\"), so the tree's synthetic root lists available drives there
+// instead of listing "/" like on POSIX platforms.
+function isRootSentinel(inputPath: string) {
+  return !inputPath || inputPath === "/" || inputPath === "\\";
+}
+
+async function listWindowsDrives(): Promise<
+  { name: string; path: string; type: FsNodeType }[]
+> {
+  const drives: { name: string; path: string; type: FsNodeType }[] = [];
+  for (let code = 65; code <= 90; code++) {
+    const drivePath = `${String.fromCharCode(code)}:\\`;
+    if (existsSync(drivePath)) {
+      drives.push({ name: drivePath, path: drivePath, type: "folder" });
+    }
+  }
+  return drives;
+}
+
+// Absolute-path guard for a path coming straight from the client. Unlike
+// path.resolve(), this never silently reinterprets an unrecognized path as
+// relative to the server's cwd — an invalid path is rejected outright.
+function toValidAbsolutePath(inputPath: string): string | null {
+  const normalized = path.normalize(String(inputPath || "").trim());
+  if (!normalized || !path.isAbsolute(normalized)) return null;
+  return normalized;
 }
 
 router.get("/current", async (_req, res) => {
@@ -27,9 +54,14 @@ router.get("/current", async (_req, res) => {
 
 router.post("/list", async (req, res) => {
   try {
-    const targetPath = toAbsolutePath(req.body?.path || "/");
+    const rawPath = String(req.body?.path ?? "");
 
-    if (!existsSync(targetPath)) {
+    if (isWindows && isRootSentinel(rawPath)) {
+      return res.json({ result: "success", data: await listWindowsDrives() });
+    }
+
+    const targetPath = toValidAbsolutePath(rawPath || "/");
+    if (!targetPath || !existsSync(targetPath)) {
       return res.json({
         result: "error",
         message: "dialog.filesystem_tree.errors.read_folder",
@@ -71,8 +103,15 @@ router.post("/list", async (req, res) => {
 
 router.post("/create", async (req, res) => {
   try {
-    const parentPath = toAbsolutePath(req.body?.path || "/");
+    const parentPath = toValidAbsolutePath(req.body?.path || "");
     const folderName = String(req.body?.name || "").trim();
+
+    if (!parentPath) {
+      return res.json({
+        result: "error",
+        message: "dialog.filesystem_tree.errors.create_folder",
+      });
+    }
 
     if (!folderName) {
       return res.json({
@@ -106,7 +145,7 @@ router.post("/create", async (req, res) => {
 
 router.post("/rename", async (req, res) => {
   try {
-    const currentPath = toAbsolutePath(req.body?.path || "");
+    const currentPath = toValidAbsolutePath(req.body?.path || "");
     const nextName = String(req.body?.newName || "").trim();
 
     if (!currentPath || !nextName) {
