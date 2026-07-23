@@ -3,7 +3,29 @@ import path from "path";
 import fs from "fs";
 import { initialize, enable } from "@electron/remote/main/index.js"; // explicit file import to avoid ESM directory import errors
 
+// TEMP DIAGNOSTIC — remove after startup crash is diagnosed
+function dbg(msg: string) {
+  try {
+    fs.appendFileSync(
+      "C:\\Maptorium\\maptorium-server\\maptorium-debug.log",
+      `${new Date().toISOString()} ${msg}\n`,
+    );
+  } catch (e) {}
+}
+dbg("module load start");
+process.on("uncaughtException", (err) => {
+  dbg("UNCAUGHT EXCEPTION: " + (err && err.stack ? err.stack : String(err)));
+});
+process.on("unhandledRejection", (reason) => {
+  dbg(
+    "UNHANDLED REJECTION: " +
+      (reason instanceof Error && reason.stack ? reason.stack : String(reason)),
+  );
+});
+dbg("before initialize()");
+
 initialize();
+dbg("after initialize()");
 
 // IPC handlers for window controls (renderer calls via preload)
 ipcMain.on("app:minimize", () => {
@@ -72,7 +94,9 @@ function ensureUserConfig() {
 }
 
 async function createWindowAndStartServer() {
+  dbg("createWindowAndStartServer start");
   ensureUserConfig();
+  dbg("ensureUserConfig done");
   // determine exec folder where public_html will be served from
   // in development use CWD; when packaged try a few common locations and pick
   // the one that actually contains `public_html` (resources/public_html or resources/app/public_html)
@@ -102,13 +126,16 @@ async function createWindowAndStartServer() {
     execFolder = process.cwd();
   }
 
+  dbg("execFolder resolved: " + execFolder);
   // require the compiled server; it should export start(opts)
   const serverModule = require(path.join(__dirname, "server"));
   if (!serverModule || typeof serverModule.start !== "function") {
+    dbg("server.start() not found in server.js");
     console.error("server.start() not found in server.js");
     app.quit();
     return;
   }
+  dbg("server module required ok");
 
   // start the server and wait until it's listening
   const opts = {
@@ -129,10 +156,12 @@ async function createWindowAndStartServer() {
       _serverInstance = srv;
     }
   } catch (err) {
+    dbg("Failed to start server: " + (err instanceof Error ? err.stack : String(err)));
     console.error("Failed to start server:", err);
     app.quit();
     return;
   }
+  dbg("server started, creating window");
 
   const url = `http://${srv.host}:${srv.port}`;
 
@@ -170,22 +199,29 @@ async function createWindowAndStartServer() {
   });
 }
 
-app.on("ready", () => {
-  createWindowAndStartServer();
-});
-
-// Quit when all windows are closed (typical Windows behavior keeps app running only when needed)
-app.on("window-all-closed", () => {
-  // on macOS apps commonly stay open; for simplicity quit on all platforms
-  app.quit();
-});
-
+dbg("before requestSingleInstanceLock");
 // In case of second instance, focus existing window (optional)
 const gotLock = app.requestSingleInstanceLock();
+dbg("gotLock=" + gotLock);
 if (!gotLock) {
+  dbg("no lock, quitting");
   app.quit();
 } else {
   app.on("second-instance", () => {
     // TODO: focus main window if you keep a reference
   });
 }
+
+app.on("ready", () => {
+  dbg("app ready event fired");
+  createWindowAndStartServer();
+});
+
+// Quit when all windows are closed (typical Windows behavior keeps app running only when needed)
+app.on("window-all-closed", () => {
+  dbg("window-all-closed");
+  // on macOS apps commonly stay open; for simplicity quit on all platforms
+  app.quit();
+});
+
+dbg("module load end");

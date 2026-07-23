@@ -145,6 +145,7 @@
     "typescript": "^5.9.3"
   },
   "overrides": {
-    "minimatch": ">=10.2.1"
+    "minimatch": ">=10.2.1",
+    "node-gyp": "^13.0.1"
   }
 }
