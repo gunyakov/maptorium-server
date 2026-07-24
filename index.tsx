@@ -1,5 +1,17 @@
 #!/usr/bin/env node
 //------------------------------------------------------------------------------
+//Node terminates the whole process on an unhandled promise rejection by
+//default (since v15) unless something handles it - log it and keep running
+//instead of hard-exiting over one background tile request rejecting deep in
+//a dependency's promise chain.
+//------------------------------------------------------------------------------
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled promise rejection (ignored to keep the server running):", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught exception (ignored to keep the server running):", err);
+});
+//------------------------------------------------------------------------------
 //Config
 //------------------------------------------------------------------------------
 import { config } from "./config/index";

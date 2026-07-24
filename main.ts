@@ -3,6 +3,17 @@ import path from "path";
 import fs from "fs";
 import { initialize, enable } from "@electron/remote/main/index.js"; // explicit file import to avoid ESM directory import errors
 
+// Node terminates the whole process on an unhandled promise rejection by
+// default (since v15) unless something handles it. A desktop app should
+// never hard-exit because one background tile request rejected somewhere
+// deep in a dependency's promise chain - log it and keep running instead.
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled promise rejection (ignored to keep the app running):", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught exception (ignored to keep the app running):", err);
+});
+
 initialize();
 
 // IPC handlers for window controls (renderer calls via preload)

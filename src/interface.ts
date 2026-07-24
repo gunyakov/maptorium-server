@@ -86,6 +86,8 @@ export interface MapInfo {
   apiKey?: string;
   headers?: RawAxiosRequestHeaders;
   storagePath?: string;
+  /** Vendored style folder (public_html/json/<style>/style.json) whose layers this map/layer contributes to the composited MapLibre style */
+  style?: string;
 }
 
 export interface iNetworkConfig {

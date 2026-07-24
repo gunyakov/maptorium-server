@@ -3,32 +3,31 @@
 //------------------------------------------------------------------------------
 import map from "../src/map";
 //------------------------------------------------------------------------------
-//Exstention to hande MAPBOX Vector maps
+//Exstention to hande OpenTopoMap vector data (roads, buildings, labels...)
 //------------------------------------------------------------------------------
 class ExtMap extends map {
   constructor() {
     super();
 
-    this.storage += "/storage/mapbox";
+    this.storage += "/storage/OpenTopoMap_Vector";
     this._info = {
-      id: "mapbox",
+      id: "opentopomapvector",
       type: "layer",
-      name: "MapBox Vector",
-      submenu: "MapBOX",
+      name: "Vector",
+      submenu: "OpenTopoMap",
       tileSize: 512,
-      attribution: "",
+      attribution:
+        "Map style: &copy; <a href='https://opentopomap.org'>OpenTopoMap</a>, " +
+        "Map data &copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
       content: "application/x-protobuf",
       format: "vector",
       encoding: "gzip",
-      apiKey: "",
-      style: "bright",
+      style: "opentopomap",
     };
-    this._updateApiKey();
   }
 
   async getURL(z: number, x: number, y: number): Promise<string> {
-    //wbw4tKDjEjT5EOx2fCDq
-    let url = `https://api.maptiler.com/tiles/v3-openmaptiles/${z}/${x}/${y}.pbf?key=${this._info.apiKey}`;
+    let url = `https://opentopomap.org/otm/${z}/${x}/${y}.pbf`;
     return url;
   }
 }

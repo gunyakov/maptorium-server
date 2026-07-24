@@ -3,33 +3,34 @@
 //------------------------------------------------------------------------------
 import map from "../src/map";
 //------------------------------------------------------------------------------
-//Exstention to hande MAPBOX Vector maps
+//Extension to handle Google Topo Map
 //------------------------------------------------------------------------------
 class ExtMap extends map {
   constructor() {
     super();
 
-    this.storage += "/storage/mapbox";
+    this.storage += "/storage/google_topo";
     this._info = {
-      id: "mapbox",
-      type: "layer",
-      name: "MapBox Vector",
-      submenu: "MapBOX",
-      tileSize: 512,
+      id: "google_topo",
+      type: "map",
+      name: "Google Topo",
+      submenu: "Google",
+      tileSize: 256,
       attribution: "",
-      content: "application/x-protobuf",
-      format: "vector",
-      encoding: "gzip",
-      apiKey: "",
-      style: "bright",
+      content: "image/jpeg",
+      format: "rasted",
+      encoding: "none",
     };
-    this._updateApiKey();
   }
 
   async getURL(z: number, x: number, y: number): Promise<string> {
-    //wbw4tKDjEjT5EOx2fCDq
-    let url = `https://api.maptiler.com/tiles/v3-openmaptiles/${z}/${x}/${y}.pbf?key=${this._info.apiKey}`;
+    let rnd = await this.getRandomInt(4);
+    let url = `https://mt${rnd}.google.com/vt/lyrs=p&x=${x}&y=${y}&z=${z}`;
     return url;
+  }
+
+  async getRandomInt(max: number): Promise<number> {
+    return Math.floor(Math.random() * Math.floor(max));
   }
 }
 

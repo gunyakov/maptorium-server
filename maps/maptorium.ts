@@ -21,6 +21,7 @@ class ExtMap extends map {
       format: "vector",
       encoding: "gzip",
       apiKey: "",
+      style: "bright",
     };
     this._updateApiKey();
   }

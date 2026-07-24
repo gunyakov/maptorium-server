@@ -3,29 +3,30 @@
 //------------------------------------------------------------------------------
 import map from "../src/map";
 //------------------------------------------------------------------------------
-//Exstention to hande ArcGIS Vector maps
+//Exstention to hande OpenTopoMap raster maps
 //------------------------------------------------------------------------------
 class ExtMap extends map {
   constructor() {
     super();
 
-    this.storage += "/storage/ArcGIS_Vector";
+    this.storage += "/storage/OpenTopoMap";
     this._info = {
-      id: "arcgisvector",
+      id: "opentopomap",
       type: "map",
-      name: "ArcGIS Vector",
-      submenu: "ArcGIS",
-      tileSize: 512,
-      attribution: "",
-      content: "application/x-protobuf",
-      format: "vector",
-      encoding: "gzip",
-      style: "arcgis",
+      name: "OpenTopoMap",
+      submenu: "OpenTopoMap",
+      tileSize: 256,
+      attribution:
+        "Kartendaten: &copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>-Mitwirkende, SRTM | " +
+        "Kartendarstellung: &copy; <a href='https://opentopomap.org'>OpenTopoMap</a> (CC-BY-SA)",
+      content: "image/png",
+      format: "rasted",
+      encoding: "none",
     };
   }
 
   async getURL(z: number, x: number, y: number): Promise<string> {
-    let url = `https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer/tile/${z}/${y}/${x}.pbf`;
+    let url = `https://tile.opentopomap.org/${z}/${x}/${y}.png`;
     return url;
   }
 }
