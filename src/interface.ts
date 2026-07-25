@@ -86,8 +86,10 @@ export interface MapInfo {
   apiKey?: string;
   headers?: RawAxiosRequestHeaders;
   storagePath?: string;
-  /** Vendored style folder (public_html/json/<style>/style.json) whose layers this map/layer contributes to the composited MapLibre style */
-  style?: string;
+  /** Vendored style folders (public_html/json/<style>/style.json) whose layers this map/layer can contribute to the composited MapLibre style; first entry is the default */
+  style?: string[];
+  /** Groups map entries that share one real underlying tile source (storage path, api key) across multiple UI-facing ids - e.g. a map/layer pair for the same provider */
+  innerID?: string;
 }
 
 export interface iNetworkConfig {

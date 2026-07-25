@@ -20,8 +20,11 @@ class ExtMap extends map {
         "Map data &copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors, " +
         "Imagery © <a href='https://www.mapbox.com/'>Mapbox</a>",
       content: "image/png",
-      format: "rasted",
+      format: "raster",
       encoding: "none",
+      headers: {
+        Referer: "https://maptorium.net/",
+      },
     };
   }
 

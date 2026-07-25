@@ -30,7 +30,7 @@ import { UserConfig } from "../src/interface";
 
 import { DownloadMode } from "../src/enum";
 
-import { checkMapHandler, getMapHandler } from "../maps";
+import { checkMapHandler, getMapHandler, getSiblingMapIDs } from "../maps";
 
 router.get("/updates", async (req, res) => {
   //Create stat of server and send it to client
@@ -75,12 +75,21 @@ router.post("/default", async (req, res) => {
           result: "error",
           message: "request.core.default.api_keys.map_id_read_failed",
         });
+      //Merge exist list with received (siblings sharing innerID get filled in below)
+      apiKeys = { ...apiKeys, ...req.body[key] };
       //If maps ID list present
       for (let i = 0; i < mapID.length; i++) {
         //If map handler is present in list
         if (checkMapHandler(mapID[i])) {
+          const apiKeyValue = req.body[key][mapID[i]];
           //Set api key for map handler
-          getMapHandler(mapID[i]).setApiKey(req.body[key][mapID[i]]);
+          getMapHandler(mapID[i]).setApiKey(apiKeyValue);
+          //Keep sibling ids sharing the same underlying tile source (e.g. a
+          //map/layer pair for the same provider) on the same api key
+          for (const siblingID of getSiblingMapIDs(mapID[i])) {
+            getMapHandler(siblingID).setApiKey(apiKeyValue);
+            apiKeys[siblingID] = apiKeyValue;
+          }
         }
         //If map handler is missing in list
         else {
@@ -91,8 +100,6 @@ router.post("/default", async (req, res) => {
           });
         }
       }
-      //Merge exist list with received
-      apiKeys = { ...apiKeys, ...req.body[key] };
       //Save api keys
       await setDefConfig(key, apiKeys, false);
     }

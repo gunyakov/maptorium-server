@@ -20,7 +20,7 @@ class ExtMap extends map {
         "Kartendaten: &copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>-Mitwirkende, SRTM | " +
         "Kartendarstellung: &copy; <a href='https://opentopomap.org'>OpenTopoMap</a> (CC-BY-SA)",
       content: "image/png",
-      format: "rasted",
+      format: "raster",
       encoding: "none",
     };
   }

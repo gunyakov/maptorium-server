@@ -59,6 +59,30 @@ const FLAT_DEM_BLOB_TYPE = "application/x-flat-dem";
 //flat tile stitches correctly with real neighbors in HeightTile.combineNeighbors.
 const DEM_TILE_SIZE = 512;
 
+//------------------------------------------------------------------------------
+//Limit concurrent contour tile generations. Each one fans out up to 9 DEM
+//sub-fetches to tiles.mapterhorn.com; letting every simultaneous /tile
+//request for this map kick off its own unbounded fan-out (e.g. while
+//panning/zooming, the browser can have dozens of tile requests in flight at
+//once) overwhelms the upstream host and starts timing many of them out
+//instead of a smaller number succeeding quickly one after another.
+//------------------------------------------------------------------------------
+const MAX_CONCURRENT_GENERATIONS = 4;
+let _activeGenerations = 0;
+const _generationQueue: Array<() => void> = [];
+
+async function acquireGenerationSlot(): Promise<void> {
+  if (_activeGenerations >= MAX_CONCURRENT_GENERATIONS) {
+    await new Promise<void>((resolve) => _generationQueue.push(resolve));
+  }
+  _activeGenerations++;
+}
+
+function releaseGenerationSlot(): void {
+  _activeGenerations--;
+  _generationQueue.shift()?.();
+}
+
 class ExtMap extends map {
   private _netConfig: iNetworkConfig | undefined;
 
@@ -97,7 +121,7 @@ class ExtMap extends map {
     cacheSize: 100,
     encoding: "terrarium",
     maxzoom: 15,
-    timeoutMs: 10_000,
+    timeoutMs: 20_000,
     getTile: this._getTile,
     decodeImage: this._decodeImage,
   });
@@ -116,7 +140,7 @@ class ExtMap extends map {
       content: "application/x-protobuf",
       format: "vector",
       encoding: "none",
-      style: "opentopomap-contour",
+      style: ["opentopomap-contour"],
     };
   }
 
@@ -140,15 +164,10 @@ class ExtMap extends map {
       else await TileStorage.insert(z, x, y, this.storage, empty, 0, this._mapVersion);
       return [404, "", 0];
     }
+    await acquireGenerationSlot();
     try {
       const abortController = new AbortController();
-      const result = await this._manager.fetchContourTile(
-        z,
-        x,
-        y,
-        { levels },
-        abortController,
-      );
+      const result = await this._manager.fetchContourTile(z, x, y, { levels }, abortController);
       const buffer = Buffer.from(result.arrayBuffer);
       if (isUpdate) {
         await TileStorage.update(z, x, y, this.storage, buffer, buffer.byteLength, this._mapVersion);
@@ -159,6 +178,8 @@ class ExtMap extends map {
     } catch (e) {
       console.error(`opentopomapcontour: failed to generate tile ${z}/${x}/${y}`, e);
       return [0, "", 0];
+    } finally {
+      releaseGenerationSlot();
     }
   }
 

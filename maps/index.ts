@@ -18,6 +18,8 @@ import osm from "./osm";
 import yandex from "./yandex";
 import yandexHyb from "./yandexHyb";
 import maptorium from "./maptorium";
+import maptoriumLayer from "./maptorium_layer";
+import mapboxpbfLayer from "./mapboxpbf_layer";
 import navionics from "./navionics";
 import garminmarine from "./garminmarine";
 import opentopo_raster from "./opentopo_raster";
@@ -52,6 +54,8 @@ initMap(osm);
 initMap(yandex);
 initMap(yandexHyb);
 initMap(maptorium);
+initMap(maptoriumLayer);
+initMap(mapboxpbfLayer);
 initMap(mapbox3d);
 initMap(mapboxterraine);
 initMap(navionics);
@@ -75,6 +79,21 @@ export function getMapsInfo(): Array<MapInfo> {
   return Object.values(arrMaps).map((mapHandler) => mapHandler.getInfo());
 }
 
+/**
+ * Other registered map ids sharing the same innerID as mapID (e.g. the "map"
+ * and "layer" entries for the same underlying provider) - these must be kept
+ * in sync for anything tied to the real tile source (storage path, api key).
+ * Returns an empty array if mapID has no innerID or no siblings.
+ */
+export function getSiblingMapIDs(mapID: string): Array<string> {
+  const innerID = arrMaps[mapID]?.getInfo().innerID;
+  if (!innerID) return [];
+  return Object.values(arrMaps)
+    .map((mapHandler) => mapHandler.getInfo())
+    .filter((info) => info.id !== mapID && info.innerID === innerID)
+    .map((info) => info.id);
+}
+
 export async function setMapStoragePath(
   mapID: string,
   storagePath: string,
@@ -84,12 +103,18 @@ export async function setMapStoragePath(
   const isUpdated = arrMaps[mapID].setpath(storagePath);
   if (!isUpdated) return false;
 
+  //Keep sibling ids sharing the same underlying tile source on the same path
+  const siblingIDs = getSiblingMapIDs(mapID);
+  for (const siblingID of siblingIDs) {
+    arrMaps[siblingID]?.setpath(storagePath);
+  }
+
   if (!save) return true;
 
-  const mapStoragePaths = {
-    ...(userConfig.mapStoragePaths || {}),
-    [mapID]: arrMaps[mapID].getPath(),
-  };
+  const mapStoragePaths = { ...(userConfig.mapStoragePaths || {}) };
+  for (const id of [mapID, ...siblingIDs]) {
+    mapStoragePaths[id] = arrMaps[id].getPath();
+  }
   return await setDefConfig("mapStoragePaths", mapStoragePaths, true);
 }
 

@@ -3,7 +3,11 @@
 //------------------------------------------------------------------------------
 import map from "../src/map";
 //------------------------------------------------------------------------------
-//Exstention to hande MAPBOX Vector maps
+//Exstention to hande MAPBOX Vector maps as an overlay layer
+//------------------------------------------------------------------------------
+//Same tiles/storage as mapboxpbf.ts (paired via innerID) - registered under a
+//separate id so it can be listed independently in the Layers menu while
+//sharing the exact same downloaded tile storage as the "map" entry.
 //------------------------------------------------------------------------------
 class ExtMap extends map {
   constructor() {
@@ -11,8 +15,8 @@ class ExtMap extends map {
 
     this.storage += "/storage/mapbox";
     this._info = {
-      id: "mapbox",
-      type: "map",
+      id: "mapbox_layer",
+      type: "layer",
       name: "MapBox Vector",
       submenu: "MapBOX",
       tileSize: 512,
@@ -22,15 +26,15 @@ class ExtMap extends map {
       encoding: "gzip",
       apiKey: "",
       style: [
-        "bright",
-        "liberty",
-        "dark",
-        "light",
-        "streets",
-        "toner",
-        "winter",
-        "dataviz",
-        "osm",
+        "bright_overlay",
+        "liberty_overlay",
+        "dark_overlay",
+        "light_overlay",
+        "streets_overlay",
+        "toner_overlay",
+        "winter_overlay",
+        "dataviz_overlay",
+        "osm_overlay",
       ],
       innerID: "mapbox",
     };

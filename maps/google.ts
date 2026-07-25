@@ -27,7 +27,7 @@ class ExtMap extends map {
       tileSize: 256,
       attribution: "",
       content: "image/jpeg",
-      format: "rasted",
+      format: "raster",
       encoding: "none",
     };
   }

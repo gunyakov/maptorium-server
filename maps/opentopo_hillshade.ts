@@ -20,7 +20,7 @@ class ExtMap extends map {
       content: "image/webp",
       format: "dem",
       encoding: "none",
-      style: "opentopomap-hillshade",
+      style: ["opentopomap-hillshade"],
     };
   }
 

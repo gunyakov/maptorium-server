@@ -18,7 +18,7 @@ class ExtMap extends map {
       tileSize: 256,
       attribution: "Hybrid (Yandex.Maps)",
       content: "image/png",
-      format: "rasted",
+      format: "raster",
       encoding: "none",
     };
   }

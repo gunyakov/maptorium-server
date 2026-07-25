@@ -20,7 +20,7 @@ class ExtMap extends map {
       content: "application/x-protobuf",
       format: "vector",
       encoding: "gzip",
-      style: "arcgis",
+      style: ["arcgis"],
     };
   }
 

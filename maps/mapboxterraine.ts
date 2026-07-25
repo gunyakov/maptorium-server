@@ -18,7 +18,7 @@ class ExtMap extends map {
       tileSize: 512,
       attribution: "",
       content: "image/webp",
-      format: "rasted",
+      format: "raster",
       encoding: "none",
       apiKey: "",
     };
