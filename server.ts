@@ -12,6 +12,7 @@ import gps_router from "./routes/gps";
 import core_router from "./routes/core";
 import map_router from "./routes/map";
 import fs_router from "./routes/fs";
+import userStyles_router from "./routes/userStyles";
 import { applyMapStoragePaths } from "./maps";
 
 export interface StartOptions {
@@ -75,6 +76,7 @@ export async function start(opts: StartOptions = {}): Promise<StartResult> {
   app.use("/map", map_router);
   app.use("/fs", fs_router);
   app.use("/filesystem", fs_router);
+  app.use("/userStyles", userStyles_router);
 
   // listen and wait until server is ready
   await new Promise<void>((resolve) => {

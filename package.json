@@ -1,7 +1,7 @@
 {
   "name": "maptorium-server",
   "productName": "Maptorium",
-  "version": "4.1.3",
+  "version": "4.2.0",
   "description": "Maptorium http api server.",
   "bin": "server-build/index.js",
   "main": "server-build/main.js",

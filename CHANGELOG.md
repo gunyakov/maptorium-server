@@ -1,5 +1,15 @@
 # maptorium-server Changelog
 
+## 4.2.0 (2026-7-29)
+
+### ✨ Features
+
+- Added the Pro mode "User Styles" API (`routes/userStyles.ts`, `src/userStyles.ts`): list/get/save/delete named snapshots of the current map style, so a customized map look can be saved and reapplied later from the UI's new Pro menu.
+
+### 🔧 Workflow
+
+- Merged the POI database into a single shared `app.db` (`src/appDatabase.ts`), migrating the legacy `POI.db3` file in place on first run. Features that used to need their own DB file (like the new saved styles) just get a new table here instead.
+
 ## 4.1.2 (2026-07-23)
 
 ### 🔧 Bugs

@@ -68,6 +68,21 @@ export interface POICategory {
   order: number;
 }
 
+export interface UserStyleListItem {
+  ID: number;
+  name: string;
+  created: number;
+  updated: number;
+}
+
+export interface UserStyleInfo {
+  ID: number;
+  name: string;
+  style: string;
+  created: number;
+  updated: number;
+}
+
 export interface ROUTE {
   ID: number;
   name: string;

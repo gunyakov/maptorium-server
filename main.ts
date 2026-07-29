@@ -60,9 +60,11 @@ const iconPath = getAssetPath(
 
 function ensureUserConfig() {
   // Writable, persistent per-user directory (~/.config/<app> on Linux,
-  // %APPDATA%\<app> on Windows). config.user.json, POI.db3 and the default
-  // tile storage folder all live here — process.cwd() is not reliable once
-  // packaged (it depends on how the app was launched, and may not be writable).
+  // %APPDATA%\<app> on Windows). config.user.json, app.db (POI/categories/
+  // routes/saved styles - migrated in place from the older POI.db3 name if
+  // found) and the default tile storage folder all live here — process.cwd()
+  // is not reliable once packaged (it depends on how the app was launched,
+  // and may not be writable).
   const dataDir = app.getPath("userData");
   fs.mkdirSync(dataDir, { recursive: true });
   process.env.MAPTORIUM_DATA_DIR = dataDir;

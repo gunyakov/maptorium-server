@@ -13,18 +13,14 @@ import { GPSCoords, POIInfo, POICategory, ROUTE, MarkInfo } from "./interface";
 import { LogModules, POIType } from "./enum";
 import { sendRoutePoint } from "./io";
 //------------------------------------------------------------------------------
-//NodeJS core file system functions
+//Shared app DB (POI/category/route/style tables, migrates legacy POI.db3)
 //------------------------------------------------------------------------------
-import { existsSync } from "fs";
-import path from "path";
-// In packaged builds main.ts points this at Electron's writable userData dir;
-// falls back to cwd for `npm start` development.
-const ExecFolder = process.env.MAPTORIUM_DATA_DIR || process.cwd();
+import { APP_DB_NAME, ensureAppDB } from "./appDatabase";
 //------------------------------------------------------------------------------
 //General POI storage
 //------------------------------------------------------------------------------
 class POIHandler {
-  private _dbName: string = path.join(ExecFolder, "POI.db3");
+  private _dbName: string = APP_DB_NAME;
   private _routeID: number = 0;
 
   private _poiToFeature(poi: POIInfo): false | any {
@@ -112,19 +108,7 @@ class POIHandler {
   }
 
   async checkDB() {
-    if (!existsSync(this._dbName)) {
-      if (await sqlite3.open(this._dbName)) {
-        await sqlite3.run(this._dbName, "CREATE_DB_1");
-        await sqlite3.run(this._dbName, "CREATE_DB_2");
-        await sqlite3.run(this._dbName, "CREATE_DB_3");
-        await sqlite3.run(this._dbName, "CREATE_DB_4");
-        await sqlite3.run(this._dbName, "CREATE_DB_5");
-        await sqlite3.run(this._dbName, "CREATE_DB_6");
-        Log.success(LogModules.poi, "POI DB was created.");
-      } else {
-        Log.error(LogModules.poi, "Cant make POI DB. Pls check location.");
-      }
-    }
+    await ensureAppDB();
     this.routeGetID();
   }
   //------------------------------------------------------------------------------

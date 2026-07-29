@@ -37,6 +37,7 @@ import gps_router from "./routes/gps";
 import core_router from "./routes/core";
 import map_router from "./routes/map";
 import fs_router from "./routes/fs";
+import userStyles_router from "./routes/userStyles";
 import { applyMapStoragePaths } from "./maps";
 //------------------------------------------------------------------------------
 (async () => {
@@ -102,6 +103,10 @@ import { applyMapStoragePaths } from "./maps";
   //----------------------------------------------------------------------------
   app.use("/fs", fs_router);
   app.use("/filesystem", fs_router);
+  //----------------------------------------------------------------------------
+  //  USER STYLES (Pro mode) API Handler
+  //----------------------------------------------------------------------------
+  app.use("/userStyles", userStyles_router);
   //----------------------------------------------------------------------------
   //Open port for incoming requests
   //----------------------------------------------------------------------------

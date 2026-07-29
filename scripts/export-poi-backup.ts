@@ -87,9 +87,17 @@ function defaultOutputFileName() {
   return `${formatDatePart(new Date())}.mpb`;
 }
 
+function defaultDBPath() {
+  // The app DB was renamed POI.db3 -> app.db (same file, now also holds the
+  // styles table); prefer the new name but fall back to the legacy one for
+  // a data dir that hasn't been opened by the app yet to migrate it.
+  const appDB = path.resolve(process.cwd(), "app.db");
+  return fs.existsSync(appDB) ? appDB : path.resolve(process.cwd(), "POI.db3");
+}
+
 function parseArgs() {
   const args = process.argv.slice(2);
-  let dbPath = path.resolve(process.cwd(), "POI.db3");
+  let dbPath = defaultDBPath();
   let outPath = path.resolve(process.cwd(), defaultOutputFileName());
   let pretty = true;
 

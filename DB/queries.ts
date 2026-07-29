@@ -66,21 +66,35 @@ export default {
   MBTILES_SELECT:
     "SELECT * FROM tiles WHERE zoom_level = ? AND tile_column = ? AND tile_row = ?;",
 
-  CREATE_DB_1: `CREATE TABLE "category" (
+  SELECT_ALL_STYLES: "SELECT ID, name, created, updated FROM styles ORDER BY name COLLATE NOCASE;",
+
+  SELECT_STYLE_BY_ID: "SELECT * FROM styles WHERE ID = ?;",
+
+  SELECT_STYLE_BY_NAME: "SELECT * FROM styles WHERE name = ?;",
+
+  INSERT_STYLE:
+    "INSERT INTO styles('name', 'style', 'created', 'updated') VALUES(?, ?, ?, ?);",
+
+  UPDATE_STYLE_BY_NAME:
+    "UPDATE styles SET style = ?, updated = ? WHERE name = ?;",
+
+  DELETE_STYLE_BY_ID: "DELETE FROM styles WHERE ID = ?;",
+
+  CREATE_DB_1: `CREATE TABLE IF NOT EXISTS "category" (
     "ID"	INTEGER UNIQUE,
     "name"	TEXT NOT NULL,
     "parentID"	INTEGER,
     "order"	INTEGER NOT NULL DEFAULT 1,
     PRIMARY KEY("ID" AUTOINCREMENT)
   )`,
-  CREATE_DB_2: `CREATE TABLE "messages" (
+  CREATE_DB_2: `CREATE TABLE IF NOT EXISTS "messages" (
     "ID"	INTEGER UNIQUE,
     "message"	TEXT,
     "readed"	INTEGER DEFAULT 0,
     "date"	INTEGER,
     PRIMARY KEY("ID" AUTOINCREMENT)
   )`,
-  CREATE_DB_3: `CREATE TABLE "poi" (
+  CREATE_DB_3: `CREATE TABLE IF NOT EXISTS "poi" (
     "ID"	INTEGER UNIQUE,
     "categoryID"	INTEGER NOT NULL,
     "name"	TEXT NOT NULL,
@@ -92,14 +106,14 @@ export default {
     "visible"	INTEGER,
     PRIMARY KEY("ID" AUTOINCREMENT)
   )`,
-  CREATE_DB_4: `CREATE TABLE "points" (
+  CREATE_DB_4: `CREATE TABLE IF NOT EXISTS "points" (
     "ID"	INTEGER UNIQUE,
     "poiID"	INTEGER,
     "lat"	INTEGER,
     "lng"	INTEGER,
     PRIMARY KEY("ID" AUTOINCREMENT)
   )`,
-  CREATE_DB_5: `CREATE TABLE "routeCoords" (
+  CREATE_DB_5: `CREATE TABLE IF NOT EXISTS "routeCoords" (
     "ID"	INTEGER NOT NULL UNIQUE,
     "routeID"	INTEGER NOT NULL,
     "lat"	REAL NOT NULL,
@@ -107,9 +121,17 @@ export default {
     "date"	INTEGER,
     PRIMARY KEY("ID" AUTOINCREMENT)
   )`,
-  CREATE_DB_6: `CREATE TABLE "routeList" (
+  CREATE_DB_6: `CREATE TABLE IF NOT EXISTS "routeList" (
     "ID"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
     "name"	TEXT,
     "distance"	INTEGER
+  )`,
+  CREATE_DB_7: `CREATE TABLE IF NOT EXISTS "styles" (
+    "ID"	INTEGER UNIQUE,
+    "name"	TEXT NOT NULL UNIQUE,
+    "style"	TEXT NOT NULL,
+    "created"	INTEGER NOT NULL,
+    "updated"	INTEGER NOT NULL,
+    PRIMARY KEY("ID" AUTOINCREMENT)
   )`,
 } as { [id: string]: string };
